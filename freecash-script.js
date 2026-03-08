@@ -193,87 +193,11 @@
       0% { transform: rotate(-180deg) scale(0); }
       100% { transform: rotate(0) scale(1); }
     }
-
-    /* Settings Button Styles - Minimal (just the button) */
-    .fc-settings-btn {
-      position: fixed;
-      bottom: 80px;
-      right: 20px;
-      width: 45px;
-      height: 45px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, #10b981, #059669);
-      border: 2px solid rgba(255,255,255,0.3);
-      color: white !important;
-      font-size: 24px;
-      cursor: pointer;
-      z-index: 999998;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 4px 15px rgba(16,185,129,0.4);
-      transition: all 0.3s ease;
-      animation: settingsPop 0.5s ease;
-      backdrop-filter: blur(4px);
-    }
-
-    .fc-settings-btn:hover {
-      transform: rotate(90deg) scale(1.1);
-      box-shadow: 0 6px 20px rgba(16,185,129,0.6);
-      background: linear-gradient(135deg, #059669, #047857);
-    }
-
-    .fc-settings-btn:active {
-      transform: rotate(180deg) scale(0.95);
-    }
-
-    .fc-settings-btn .gear-icon {
-      color: white !important;
-      filter: brightness(0) invert(1);
-    }
-
-    @keyframes settingsPop {
-      0% { transform: scale(0) rotate(-180deg); opacity: 0; }
-      70% { transform: scale(1.1) rotate(10deg); }
-      100% { transform: scale(1) rotate(0); opacity: 1; }
-    }
-
-    /* Prevent body scroll when modal is open */
-    body.fc-modal-open {
-      overflow: hidden !important;
-    }
   `);
 
-  // ========== SETTINGS BUTTON (Just the button, modal is in settings.js) ==========
-  function createSettingsButton() {
-    if (!document.body) {
-      setTimeout(createSettingsButton, 50);
-      return;
-    }
+  // Remove settings button creation from loader script - it will be handled by settings.js
 
-    // Create settings button with white gear icon
-    const settingsBtn = document.createElement('div');
-    settingsBtn.className = 'fc-settings-btn';
-    settingsBtn.id = 'fc-settings-btn';
-    settingsBtn.innerHTML = '<span class="gear-icon" style="color: white !important;">⚙️</span>';
-    settingsBtn.title = 'DuckyQuack Settings';
-    document.body.appendChild(settingsBtn);
-
-    // Settings button click handler - this will be overridden by settings.js
-    settingsBtn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      // Check if settings modal function exists (from settings.js)
-      if (typeof window.toggleSettingsModal === 'function') {
-        window.toggleSettingsModal(true);
-      } else {
-        console.log('Settings modal not loaded yet');
-      }
-    });
-
-    console.log('⚙️ Settings button created');
-  }
-
-  // Wait for body to exist before adding loader and settings
+  // Wait for body to exist before adding loader
   function addLoader() {
     if (!document.body) {
       setTimeout(addLoader, 50);
@@ -328,11 +252,9 @@
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
       addLoader();
-      createSettingsButton();
     });
   } else {
     addLoader();
-    createSettingsButton();
   }
 
   // Store previous percentages to detect REAL changes
