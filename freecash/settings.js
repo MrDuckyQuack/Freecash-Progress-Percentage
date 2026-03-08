@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Freecash Progress Settings UI
 // @namespace    freecash-settings-ui
-// @version      1.6.0
+// @version      1.6.1
 // @description  Settings UI for Freecash Progress Script with auto-save
 // @author       DuckyQuack
 // @match        https://freecash.com/*
@@ -983,52 +983,59 @@
     }
 
     // Save settings button (optimized)
-    const saveBtn = document.getElementById('fc-save-settings');
-    if (saveBtn) {
-      saveBtn.addEventListener('click', () => {
-        // Gather all settings
-        const newConfig = {
-          // Main tab settings
-          showDuckWelcome: getCachedElement('fc-toggle-duck-welcome')?.checked ?? true,
-          
-          // Performance tab settings
-          animationsEnabled: getCachedElement('fc-toggle-animations')?.checked ?? true,
-          numberRollEnabled: getCachedElement('fc-toggle-number-roll')?.checked ?? true,
-          duckDanceEnabled: getCachedElement('fc-toggle-duck-dance')?.checked ?? true,
-          borderPulseEnabled: getCachedElement('fc-toggle-border-pulse')?.checked ?? true,
-          showEmojis: getCachedElement('fc-toggle-emojis')?.checked ?? true,
-          decimalPrecision: parseInt(getCachedElement('fc-slider-precision')?.value ?? '4'),
-          updateSpeed: getCachedElement('fc-select-speed')?.value ?? 'normal'
-        };
-        
-        // Save to localStorage
-        try {
-          localStorage.setItem('freecashProgressConfig', JSON.stringify(newConfig));
-        } catch (e) {
-          console.error('Error saving to localStorage:', e);
-        }
-        
-        // Update config in main script
-        if (typeof window.updateConfig === 'function') {
-          window.updateConfig(newConfig);
-        }
-        
-        if (window.userConfig) {
-          Object.assign(window.userConfig, newConfig);
-        }
-        
-        // Dispatch event for loading.js to listen to
-        window.dispatchEvent(new CustomEvent('duckConfigChanged', { detail: newConfig }));
-        
-        // Show save confirmation
-        const originalHTML = saveBtn.innerHTML;
-        saveBtn.innerHTML = '<span>✅</span> Saved!';
-        
-        setTimeout(() => {
-          saveBtn.innerHTML = originalHTML;
-        }, 2000);
-      });
+const saveBtn = document.getElementById('fc-save-settings');
+if (saveBtn) {
+  saveBtn.addEventListener('click', () => {
+    // Gather all settings
+    const newConfig = {
+      // Main tab settings
+      showDuckWelcome: getCachedElement('fc-toggle-duck-welcome')?.checked ?? true,
+      
+      // Performance tab settings
+      animationsEnabled: getCachedElement('fc-toggle-animations')?.checked ?? true,
+      numberRollEnabled: getCachedElement('fc-toggle-number-roll')?.checked ?? true,
+      duckDanceEnabled: getCachedElement('fc-toggle-duck-dance')?.checked ?? true,
+      borderPulseEnabled: getCachedElement('fc-toggle-border-pulse')?.checked ?? true,
+      showEmojis: getCachedElement('fc-toggle-emojis')?.checked ?? true,
+      decimalPrecision: parseInt(getCachedElement('fc-slider-precision')?.value ?? '4'),
+      updateSpeed: getCachedElement('fc-select-speed')?.value ?? 'normal'
+    };
+    
+    console.log('💾 Saving settings:', newConfig);
+    
+    // Save to localStorage directly as backup
+    try {
+      localStorage.setItem('freecashProgressConfig', JSON.stringify(newConfig));
+      console.log('✅ Saved to localStorage');
+    } catch (e) {
+      console.error('Error saving to localStorage:', e);
     }
+    
+    // Update config in main script
+    if (typeof window.updateConfig === 'function') {
+      window.updateConfig(newConfig);
+      console.log('✅ Called window.updateConfig');
+    } else {
+      console.warn('window.updateConfig not available');
+    }
+    
+    if (window.userConfig) {
+      Object.assign(window.userConfig, newConfig);
+      console.log('✅ Updated window.userConfig');
+    }
+    
+    // Dispatch event for loading.js
+    window.dispatchEvent(new CustomEvent('duckConfigChanged', { detail: newConfig }));
+    
+    // Show save confirmation
+    const originalHTML = saveBtn.innerHTML;
+    saveBtn.innerHTML = '<span>✅</span> Saved!';
+    
+    setTimeout(() => {
+      saveBtn.innerHTML = originalHTML;
+    }, 2000);
+  });
+}
 
     // Support tab buttons
     const copyUsernameBtn = document.getElementById('fc-copy-username');
