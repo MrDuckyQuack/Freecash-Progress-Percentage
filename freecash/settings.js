@@ -1152,7 +1152,7 @@
         </div>
         
         <div class="fc-settings-modal-footer">
-          Made with 🦆 by DuckyQuack | v3.5
+          Made with 🦆 by DuckyQuack | v3.6
         </div>
       `;
     }
