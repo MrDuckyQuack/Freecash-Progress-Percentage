@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Freecash Progress Percentage with Colored Borders - Made by DuckyQuack
 // @namespace    freecash-percent-4dec
-// @version      3.6.0
+// @version      3.6.1
 // @description  Show progress percentage with colored container borders and duck dance at 100% - Customized by DuckyQuack
 // @match        https://freecash.com/*
 // @match        https://www.freecash.com/*
@@ -9,8 +9,6 @@
 // @grant        GM_addStyle
 // @grant        GM_setValue
 // @grant        GM_getValue
-// @require      https://raw.githubusercontent.com/MrDuckyQuack/Freecash-Progress-Percentage/refs/heads/main/settings.js
-// @require      https://raw.githubusercontent.com/MrDuckyQuack/Freecash-Progress-Percentage/refs/heads/main/progress.js
 // ==/UserScript==
 
 (function () {
