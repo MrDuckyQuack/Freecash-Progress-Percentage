@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Freecash Progress Settings UI
 // @namespace    freecash-settings-ui
-// @version      1.6.3
+// @version      1.6.4
 // @description  Settings UI for Freecash Progress Script with auto-save
 // @author       DuckyQuack
 // @match        https://freecash.com/*
@@ -147,73 +147,28 @@
         -webkit-overflow-scrolling: touch;
       }
 
-      /* Main Tab Styles - COMPACT */
+      /* Main Tab Styles - NOW MATCHES PERFORMANCE TAB */
       .fc-main-section {
         padding: 5px 0;
       }
 
-      .fc-main-card {
+      .fc-setting-group {
         background: rgba(255,255,255,0.05);
         border-radius: 12px;
         padding: 15px;
         margin-bottom: 15px;
         border: 1px solid rgba(16,185,129,0.2);
-        display: flex;
-        flex-direction: column;
-        height: 100%;
       }
 
-      .fc-main-card h4 {
-        margin: 0 0 12px 0;
+      .fc-setting-group h4 {
+        margin: 0 0 15px 0;
         color: #10b981;
-        font-size: 15px;
+        font-size: 16px;
         display: flex;
         align-items: center;
-        gap: 6px;
+        gap: 8px;
         border-bottom: 1px solid rgba(16,185,129,0.3);
-        padding-bottom: 6px;
-      }
-
-      .fc-main-card .fc-setting-item {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        margin-bottom: 8px;
-        padding: 3px 0;
-        min-height: 32px;
-      }
-
-      .fc-main-card .fc-setting-label {
-        display: flex;
-        align-items: center;
-        gap: 6px;
-        color: #e5e7eb;
-        font-size: 13px;
-      }
-
-      .fc-main-card .fc-setting-label span {
-        font-size: 1.1em;
-      }
-
-      .fc-main-card .fc-setting-description {
-        font-size: 11px;
-        color: #9ca3af;
-        margin-top: 2px;
-        padding-left: 28px;
-        margin-bottom: 8px;
-      }
-
-      /* Coming Soon Duck (kept for charm) */
-      .fc-coming-soon-duck {
-        font-size: 40px;
-        margin: 10px 0;
-        animation: duckFloat 2s ease-in-out infinite;
-        opacity: 0.5;
-      }
-
-      @keyframes duckFloat {
-        0%, 100% { transform: translateY(0); }
-        50% { transform: translateY(-10px); }
+        padding-bottom: 8px;
       }
 
       /* Support Tab Styles */
@@ -418,27 +373,13 @@
         font-size: 1.2em;
       }
 
-      /* Circular Toggle Switch - Optimized - SMALLER for main tab */
+      /* Circular Toggle Switch - STANDARD SIZE for all tabs */
       .fc-toggle {
         position: relative;
         display: inline-block;
-        width: 46px;
-        height: 24px;
+        width: 52px;
+        height: 28px;
         flex-shrink: 0;
-      }
-
-      .fc-toggle-sm {
-        width: 40px;
-        height: 20px;
-      }
-
-      .fc-toggle-sm .fc-toggle-slider:before {
-        height: 18px;
-        width: 18px;
-      }
-
-      .fc-toggle-sm input:checked + .fc-toggle-slider:before {
-        transform: translateX(20px);
       }
 
       .fc-toggle-slider {
@@ -456,8 +397,8 @@
       .fc-toggle-slider:before {
         position: absolute;
         content: "";
-        height: 20px;
-        width: 20px;
+        height: 24px;
+        width: 24px;
         left: 2px;
         bottom: 2px;
         background-color: white;
@@ -471,7 +412,7 @@
       }
 
       input:checked + .fc-toggle-slider:before {
-        transform: translateX(22px);
+        transform: translateX(24px);
       }
 
       /* Select Dropdown - Optimized */
@@ -609,7 +550,7 @@
         to { opacity: 1; }
       }
 
-      /* Settings Button Styles - UPDATED: White gear, no border */
+      /* Settings Button Styles - White gear, no border */
       .fc-settings-btn {
         position: fixed !important;
         bottom: 80px !important;
@@ -733,10 +674,10 @@
       showEmojis: true,
       decimalPrecision: 4,
       updateSpeed: 'normal',
-      showDuckWelcome: true // Duck welcome screen toggle (default: enabled)
+      showDuckWelcome: true
     };
 
-    // Build modal with tabs - UPDATED Main tab with compact layout and save button at bottom
+    // Build modal with tabs - Main tab now matches Performance tab exactly
     modal.innerHTML = `
       <div class="fc-settings-modal-header">
         <h3><span>🦆</span> DuckyQuack Settings</h3>
@@ -749,39 +690,34 @@
         <button class="fc-settings-tab" data-tab="support"><span>❓</span> Support</button>
       </div>
       
-      <!-- Main Tab Content - COMPACT with save button at bottom -->
+      <!-- Main Tab Content - NOW MATCHES PERFORMANCE TAB EXACTLY -->
       <div class="fc-settings-tab-content" id="fc-tab-main">
         <div class="fc-main-section">
-          <div class="fc-main-card">
+          <div class="fc-setting-group">
             <h4><span>🦆</span> Welcome Screen</h4>
             
             <div class="fc-setting-item">
               <span class="fc-setting-label">
                 <span>🎬</span> Show Duck Welcome Screen
               </span>
-              <label class="fc-toggle fc-toggle-sm">
+              <label class="fc-toggle">
                 <input type="checkbox" id="fc-toggle-duck-welcome" ${currentConfig.showDuckWelcome !== false ? 'checked' : ''}>
                 <span class="fc-toggle-slider"></span>
               </label>
             </div>
-            <div class="fc-setting-description" style="padding-left: 28px; font-size: 11px;">
-              Show duck loading screen with floating ducks and balloons
-            </div>
-            
-            <div style="margin-top: 15px; text-align: center; opacity: 0.5;">
-              <div class="fc-coming-soon-duck">🦆✨</div>
-              <div style="color: #9ca3af; font-size: 11px;">More main features coming soon!</div>
+            <div class="fc-setting-description">
+              Show duck loading screen with floating ducks and balloons when you first visit the site
             </div>
           </div>
         </div>
         
-        <!-- Save button at bottom of main tab (like performance tab) -->
+        <!-- Save button at bottom -->
         <button class="fc-save-btn" id="fc-save-main-settings">
           <span>💾</span> Save Main Settings
         </button>
       </div>
       
-      <!-- Performance Tab Content - Optimized structure -->
+      <!-- Performance Tab Content -->
       <div class="fc-settings-tab-content" id="fc-tab-performance" style="display: none;">
         <div class="fc-performance-section">
           <div class="fc-setting-group">
@@ -1199,7 +1135,7 @@
     // Initial load of settings
     loadSettingsIntoUI();
 
-    console.log('⚙️ Settings UI initialized with white gear, no border, and compact main tab with save button at bottom');
+    console.log('⚙️ Settings UI initialized - Main tab now matches Performance tab exactly');
   }
 
   // Start waiting for main script
