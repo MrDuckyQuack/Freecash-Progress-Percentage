@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Freecash Progress Settings UI
 // @namespace    freecash-settings-ui
-// @version      1.6.1
+// @version      1.6.2
 // @description  Settings UI for Freecash Progress Script with auto-save
 // @author       DuckyQuack
 // @match        https://freecash.com/*
@@ -147,7 +147,7 @@
         -webkit-overflow-scrolling: touch;
       }
 
-      /* Main Tab Styles - UPDATED with toggle */
+      /* Main Tab Styles */
       .fc-main-section {
         padding: 5px 0;
       }
@@ -702,7 +702,7 @@
       showDuckWelcome: true // NEW: Duck welcome screen toggle (default: enabled)
     };
 
-    // Build modal with tabs - UPDATED Main tab with toggle
+    // Build modal with tabs - UPDATED Main tab with save button
     modal.innerHTML = `
       <div class="fc-settings-modal-header">
         <h3><span>🦆</span> DuckyQuack Settings</h3>
@@ -715,7 +715,7 @@
         <button class="fc-settings-tab" data-tab="support"><span>❓</span> Support</button>
       </div>
       
-      <!-- Main Tab Content - UPDATED with Duck Welcome Toggle -->
+      <!-- Main Tab Content - UPDATED with Duck Welcome Toggle and Save Button -->
       <div class="fc-settings-tab-content" id="fc-tab-main">
         <div class="fc-main-section">
           <div class="fc-main-card">
@@ -733,6 +733,11 @@
             <div class="fc-setting-description">
               Show a cute duck loading screen with floating ducks and balloons when you first visit the site
             </div>
+            
+            <!-- SAVE BUTTON ADDED HERE -->
+            <button class="fc-save-btn" id="fc-save-main-settings" style="margin-top: 20px;">
+              <span>💾</span> Save Welcome Screen Setting
+            </button>
             
             <div style="margin-top: 20px; text-align: center; opacity: 0.7;">
               <div class="fc-coming-soon-duck">🦆✨</div>
@@ -982,60 +987,109 @@
       precisionSlider.addEventListener('input', debounce(updatePrecisionDisplay, 16));
     }
 
+    // Main tab save button
+    const saveMainBtn = document.getElementById('fc-save-main-settings');
+    if (saveMainBtn) {
+      saveMainBtn.addEventListener('click', () => {
+        // Get the duck welcome setting
+        const showDuckWelcome = getCachedElement('fc-toggle-duck-welcome')?.checked ?? true;
+        
+        // Create config object with just this setting (preserve others)
+        const newConfig = {
+          ...window.userConfig, // Keep existing settings
+          showDuckWelcome: showDuckWelcome
+        };
+        
+        console.log('💾 Saving main settings:', { showDuckWelcome });
+        
+        // Save to localStorage
+        try {
+          localStorage.setItem('freecashProgressConfig', JSON.stringify(newConfig));
+          console.log('✅ Saved to localStorage');
+        } catch (e) {
+          console.error('Error saving to localStorage:', e);
+        }
+        
+        // Update config in main script
+        if (typeof window.updateConfig === 'function') {
+          window.updateConfig(newConfig);
+          console.log('✅ Called window.updateConfig');
+        } else {
+          console.warn('window.updateConfig not available');
+        }
+        
+        if (window.userConfig) {
+          Object.assign(window.userConfig, newConfig);
+          console.log('✅ Updated window.userConfig');
+        }
+        
+        // Dispatch event for loading.js
+        window.dispatchEvent(new CustomEvent('duckConfigChanged', { detail: newConfig }));
+        
+        // Show save confirmation
+        const originalHTML = saveMainBtn.innerHTML;
+        saveMainBtn.innerHTML = '<span>✅</span> Saved!';
+        
+        setTimeout(() => {
+          saveMainBtn.innerHTML = originalHTML;
+        }, 2000);
+      });
+    }
+
     // Save settings button (optimized)
-const saveBtn = document.getElementById('fc-save-settings');
-if (saveBtn) {
-  saveBtn.addEventListener('click', () => {
-    // Gather all settings
-    const newConfig = {
-      // Main tab settings
-      showDuckWelcome: getCachedElement('fc-toggle-duck-welcome')?.checked ?? true,
-      
-      // Performance tab settings
-      animationsEnabled: getCachedElement('fc-toggle-animations')?.checked ?? true,
-      numberRollEnabled: getCachedElement('fc-toggle-number-roll')?.checked ?? true,
-      duckDanceEnabled: getCachedElement('fc-toggle-duck-dance')?.checked ?? true,
-      borderPulseEnabled: getCachedElement('fc-toggle-border-pulse')?.checked ?? true,
-      showEmojis: getCachedElement('fc-toggle-emojis')?.checked ?? true,
-      decimalPrecision: parseInt(getCachedElement('fc-slider-precision')?.value ?? '4'),
-      updateSpeed: getCachedElement('fc-select-speed')?.value ?? 'normal'
-    };
-    
-    console.log('💾 Saving settings:', newConfig);
-    
-    // Save to localStorage directly as backup
-    try {
-      localStorage.setItem('freecashProgressConfig', JSON.stringify(newConfig));
-      console.log('✅ Saved to localStorage');
-    } catch (e) {
-      console.error('Error saving to localStorage:', e);
+    const saveBtn = document.getElementById('fc-save-settings');
+    if (saveBtn) {
+      saveBtn.addEventListener('click', () => {
+        // Gather all settings
+        const newConfig = {
+          // Main tab settings
+          showDuckWelcome: getCachedElement('fc-toggle-duck-welcome')?.checked ?? true,
+          
+          // Performance tab settings
+          animationsEnabled: getCachedElement('fc-toggle-animations')?.checked ?? true,
+          numberRollEnabled: getCachedElement('fc-toggle-number-roll')?.checked ?? true,
+          duckDanceEnabled: getCachedElement('fc-toggle-duck-dance')?.checked ?? true,
+          borderPulseEnabled: getCachedElement('fc-toggle-border-pulse')?.checked ?? true,
+          showEmojis: getCachedElement('fc-toggle-emojis')?.checked ?? true,
+          decimalPrecision: parseInt(getCachedElement('fc-slider-precision')?.value ?? '4'),
+          updateSpeed: getCachedElement('fc-select-speed')?.value ?? 'normal'
+        };
+        
+        console.log('💾 Saving settings:', newConfig);
+        
+        // Save to localStorage directly as backup
+        try {
+          localStorage.setItem('freecashProgressConfig', JSON.stringify(newConfig));
+          console.log('✅ Saved to localStorage');
+        } catch (e) {
+          console.error('Error saving to localStorage:', e);
+        }
+        
+        // Update config in main script
+        if (typeof window.updateConfig === 'function') {
+          window.updateConfig(newConfig);
+          console.log('✅ Called window.updateConfig');
+        } else {
+          console.warn('window.updateConfig not available');
+        }
+        
+        if (window.userConfig) {
+          Object.assign(window.userConfig, newConfig);
+          console.log('✅ Updated window.userConfig');
+        }
+        
+        // Dispatch event for loading.js
+        window.dispatchEvent(new CustomEvent('duckConfigChanged', { detail: newConfig }));
+        
+        // Show save confirmation
+        const originalHTML = saveBtn.innerHTML;
+        saveBtn.innerHTML = '<span>✅</span> Saved!';
+        
+        setTimeout(() => {
+          saveBtn.innerHTML = originalHTML;
+        }, 2000);
+      });
     }
-    
-    // Update config in main script
-    if (typeof window.updateConfig === 'function') {
-      window.updateConfig(newConfig);
-      console.log('✅ Called window.updateConfig');
-    } else {
-      console.warn('window.updateConfig not available');
-    }
-    
-    if (window.userConfig) {
-      Object.assign(window.userConfig, newConfig);
-      console.log('✅ Updated window.userConfig');
-    }
-    
-    // Dispatch event for loading.js
-    window.dispatchEvent(new CustomEvent('duckConfigChanged', { detail: newConfig }));
-    
-    // Show save confirmation
-    const originalHTML = saveBtn.innerHTML;
-    saveBtn.innerHTML = '<span>✅</span> Saved!';
-    
-    setTimeout(() => {
-      saveBtn.innerHTML = originalHTML;
-    }, 2000);
-  });
-}
 
     // Support tab buttons
     const copyUsernameBtn = document.getElementById('fc-copy-username');
@@ -1111,7 +1165,7 @@ if (saveBtn) {
     // Initial load of settings
     loadSettingsIntoUI();
 
-    console.log('⚙️ Settings UI initialized with button and duck welcome toggle');
+    console.log('⚙️ Settings UI initialized with button and duck welcome toggle + save button');
   }
 
   // Start waiting for main script
