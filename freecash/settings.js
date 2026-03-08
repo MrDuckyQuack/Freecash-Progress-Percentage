@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Freecash Progress Settings UI
 // @namespace    freecash-settings-ui
-// @version      1.6
+// @version      1.7
 // @description  Settings UI for Freecash Progress Script with auto-save
 // @author       DuckyQuack
 // @match        https://freecash.com/*
@@ -25,9 +25,9 @@
   }
 
   function initSettingsUI() {
-    // Add settings modal styles
+    // Add settings modal styles (optimized)
     GM_addStyle(`
-      /* Settings Modal Styles */
+      /* Settings Modal Styles - Optimized */
       .fc-settings-modal {
         position: fixed;
         bottom: 140px;
@@ -39,12 +39,13 @@
         border-radius: 20px;
         padding: 0;
         z-index: 999999;
-        box-shadow: 0 10px 40px rgba(0,0,0,0.5), 0 0 30px rgba(16,185,129,0.3);
-        animation: modalSlideUp 0.3s ease;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+        animation: modalSlideUp 0.2s ease;
         color: white;
         font-family: 'Segoe UI', system-ui, sans-serif;
         overflow: hidden;
-        transition: opacity 0.3s ease, transform 0.3s ease;
+        transition: opacity 0.2s ease, transform 0.2s ease;
+        will-change: transform, opacity;
       }
 
       .fc-settings-modal.closing {
@@ -77,9 +78,7 @@
         margin: 0;
         font-size: 18px;
         font-weight: 600;
-        background: linear-gradient(90deg, #10b981, #34d399);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
+        color: #10b981;
         display: flex;
         align-items: center;
         gap: 8px;
@@ -98,13 +97,12 @@
         align-items: center;
         justify-content: center;
         border-radius: 50%;
-        transition: all 0.2s ease;
+        transition: background 0.2s ease;
       }
 
       .fc-settings-modal-close:hover {
         background: rgba(255,255,255,0.1);
         color: white;
-        transform: rotate(90deg);
       }
 
       /* Tab Navigation */
@@ -123,7 +121,7 @@
         font-size: 14px;
         font-weight: 600;
         cursor: pointer;
-        transition: all 0.3s ease;
+        transition: color 0.2s ease;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -132,7 +130,6 @@
 
       .fc-settings-tab:hover {
         color: #10b981;
-        background: rgba(16,185,129,0.1);
       }
 
       .fc-settings-tab.active {
@@ -140,11 +137,13 @@
         border-bottom: 3px solid #10b981;
       }
 
-      /* Tab Content */
+      /* Tab Content - Optimized scrolling */
       .fc-settings-tab-content {
         padding: 20px;
         max-height: 400px;
         overflow-y: auto;
+        scroll-behavior: smooth;
+        -webkit-overflow-scrolling: touch;
       }
 
       /* Coming Soon Tab */
@@ -155,24 +154,15 @@
       }
 
       @keyframes duckFloat {
-        0%, 100% { transform: translateY(0) rotate(0deg); }
-        50% { transform: translateY(-10px) rotate(5deg); }
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-10px); }
       }
 
       .fc-coming-soon-text {
         font-size: 28px;
         font-weight: bold;
-        background: linear-gradient(90deg, #10b981, #34d399, #10b981);
-        background-size: 200% auto;
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        animation: textShine 2s linear infinite;
+        color: #10b981;
         margin: 10px 0;
-      }
-
-      @keyframes textShine {
-        0% { background-position: 0% center; }
-        100% { background-position: 200% center; }
       }
 
       .fc-progress-bar {
@@ -187,14 +177,8 @@
       .fc-progress-fill {
         height: 100%;
         width: 33%;
-        background: linear-gradient(90deg, #10b981, #34d399);
+        background: #10b981;
         border-radius: 3px;
-        animation: progressPulse 1.5s ease infinite;
-      }
-
-      @keyframes progressPulse {
-        0%, 100% { opacity: 0.8; }
-        50% { opacity: 1; }
       }
 
       /* Support Tab Styles */
@@ -219,7 +203,7 @@
         gap: 8px;
       }
 
-      /* FAQ Accordion Styles */
+      /* FAQ Accordion Styles - Optimized */
       .fc-faq-item {
         margin-bottom: 10px;
         border-radius: 8px;
@@ -236,7 +220,6 @@
         justify-content: space-between;
         gap: 10px;
         cursor: pointer;
-        transition: all 0.2s ease;
         user-select: none;
       }
 
@@ -252,7 +235,7 @@
 
       .fc-faq-arrow {
         font-size: 12px;
-        transition: transform 0.3s ease;
+        transition: transform 0.2s ease;
         color: #10b981;
       }
 
@@ -263,12 +246,11 @@
       .fc-faq-answer {
         max-height: 0;
         overflow: hidden;
-        transition: max-height 0.3s ease, padding 0.3s ease;
+        transition: max-height 0.2s ease;
         background: rgba(0,0,0,0.3);
         color: #d1d5db;
         font-size: 13px;
         line-height: 1.5;
-        padding: 0 15px;
       }
 
       .fc-faq-item.expanded .fc-faq-answer {
@@ -286,14 +268,14 @@
         border-radius: 10px;
         text-decoration: none;
         margin: 15px 0;
-        transition: all 0.3s ease;
+        transition: transform 0.2s ease;
         font-weight: 500;
+        will-change: transform;
       }
 
       .fc-discord-link:hover {
         background: #4752c4;
         transform: translateY(-2px);
-        box-shadow: 0 5px 15px rgba(88, 101, 242, 0.4);
       }
 
       .fc-pm-note {
@@ -323,11 +305,12 @@
         border-radius: 8px;
         font-weight: 600;
         cursor: pointer;
-        transition: all 0.3s ease;
+        transition: transform 0.2s ease;
         display: flex;
         align-items: center;
         justify-content: center;
         gap: 6px;
+        will-change: transform;
       }
 
       .fc-contact-btn.primary {
@@ -350,9 +333,11 @@
         transform: translateY(-2px);
       }
 
-      /* Performance Tab Styles */
+      /* Performance Tab Styles - Optimized */
       .fc-performance-section {
         padding: 5px 0;
+        content-visibility: auto;
+        contain-intrinsic-size: 500px;
       }
 
       .fc-setting-group {
@@ -360,6 +345,7 @@
         border-radius: 12px;
         padding: 15px;
         margin-bottom: 15px;
+        contain: content;
       }
 
       .fc-setting-group h4 {
@@ -379,6 +365,7 @@
         justify-content: space-between;
         margin-bottom: 12px;
         padding: 5px 0;
+        min-height: 40px;
       }
 
       .fc-setting-label {
@@ -393,7 +380,7 @@
         font-size: 1.2em;
       }
 
-      /* Circular Toggle Switch - IMPROVED */
+      /* Circular Toggle Switch - Optimized */
       .fc-toggle {
         position: relative;
         display: inline-block;
@@ -417,9 +404,8 @@
         right: 0;
         bottom: 0;
         background-color: #4b5563;
-        transition: .3s;
+        transition: background-color 0.2s ease;
         border-radius: 34px;
-        box-shadow: inset 0 1px 3px rgba(0,0,0,0.3);
       }
 
       .fc-toggle-slider:before {
@@ -430,9 +416,9 @@
         left: 2px;
         bottom: 2px;
         background-color: white;
-        transition: .3s;
+        transition: transform 0.2s ease;
         border-radius: 50%;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        will-change: transform;
       }
 
       input:checked + .fc-toggle-slider {
@@ -443,12 +429,12 @@
         transform: translateX(24px);
       }
 
-      /* Select Dropdown */
+      /* Select Dropdown - Optimized */
       .fc-select {
         background: rgba(0,0,0,0.3);
         border: 1px solid #10b981;
         color: white;
-        padding: 8px 16px;
+        padding: 8px 30px 8px 16px;
         border-radius: 30px;
         font-size: 13px;
         cursor: pointer;
@@ -466,7 +452,7 @@
         color: white;
       }
 
-      /* Slider */
+      /* Slider - Optimized */
       .fc-slider-container {
         display: flex;
         align-items: center;
@@ -489,14 +475,13 @@
         background: #10b981;
         border-radius: 50%;
         cursor: pointer;
-        transition: all 0.2s ease;
-        box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+        transition: transform 0.1s ease;
         border: 2px solid white;
+        will-change: transform;
       }
 
       .fc-slider::-webkit-slider-thumb:hover {
         transform: scale(1.15);
-        box-shadow: 0 0 15px #10b981;
       }
 
       .fc-slider-value {
@@ -521,23 +506,24 @@
       .fc-save-btn {
         width: 100%;
         padding: 12px;
-        background: linear-gradient(135deg, #10b981, #059669);
+        background: #10b981;
         border: none;
         border-radius: 10px;
         color: white;
         font-weight: 600;
         cursor: pointer;
-        transition: all 0.3s ease;
+        transition: transform 0.2s ease;
         margin-top: 10px;
         display: flex;
         align-items: center;
         justify-content: center;
         gap: 8px;
+        will-change: transform;
       }
 
       .fc-save-btn:hover {
+        background: #059669;
         transform: translateY(-2px);
-        box-shadow: 0 5px 15px rgba(16,185,129,0.4);
       }
 
       .fc-save-btn:active {
@@ -563,7 +549,8 @@
         backdrop-filter: blur(4px);
         z-index: 999998;
         animation: fadeIn 0.2s ease;
-        transition: opacity 0.3s ease;
+        transition: opacity 0.2s ease;
+        will-change: opacity;
       }
 
       .fc-settings-modal-overlay.closing {
@@ -593,6 +580,9 @@
     modal.className = 'fc-settings-modal';
     modal.id = 'fc-settings-modal';
     
+    // Cache DOM elements for better performance
+    let cachedElements = {};
+    
     // Get current config from main script or localStorage
     function loadConfigFromStorage() {
       try {
@@ -618,55 +608,38 @@
       updateSpeed: 'normal'
     };
 
-    // Build modal with tabs
+    // Build modal with tabs (simplified HTML for better performance)
     modal.innerHTML = `
       <div class="fc-settings-modal-header">
-        <h3>
-          <span>🦆</span>
-          DuckyQuack Settings
-        </h3>
+        <h3><span>🦆</span> DuckyQuack Settings</h3>
         <button class="fc-settings-modal-close" id="fc-settings-modal-close">✕</button>
       </div>
       
       <div class="fc-settings-tabs">
-        <button class="fc-settings-tab active" data-tab="main">
-          <span>🏠</span> Main
-        </button>
-        <button class="fc-settings-tab" data-tab="performance">
-          <span>⚡</span> Performance
-        </button>
-        <button class="fc-settings-tab" data-tab="support">
-          <span>❓</span> Support
-        </button>
+        <button class="fc-settings-tab active" data-tab="main"><span>🏠</span> Main</button>
+        <button class="fc-settings-tab" data-tab="performance"><span>⚡</span> Performance</button>
+        <button class="fc-settings-tab" data-tab="support"><span>❓</span> Support</button>
       </div>
       
-      <!-- Main Tab Content (Coming Soon) -->
+      <!-- Main Tab Content -->
       <div class="fc-settings-tab-content" id="fc-tab-main">
         <div style="text-align: center;">
           <div class="fc-coming-soon-duck">🦆✨</div>
           <div class="fc-coming-soon-text">Coming Soon!</div>
-          <div class="fc-progress-bar">
-            <div class="fc-progress-fill"></div>
-          </div>
-          <div style="color: #9ca3af; font-size: 14px; margin: 15px 0;">
-            More features are being cooked...
-          </div>
-          <div style="font-size: 24px; opacity: 0.5;">
-            ⚙️ 🎨 🛠️
-          </div>
+          <div class="fc-progress-bar"><div class="fc-progress-fill"></div></div>
+          <div style="color: #9ca3af; font-size: 14px; margin: 15px 0;">More features are being cooked...</div>
+          <div style="font-size: 24px; opacity: 0.5;">⚙️ 🎨 🛠️</div>
         </div>
       </div>
       
-      <!-- Performance Tab Content -->
+      <!-- Performance Tab Content - Optimized structure -->
       <div class="fc-settings-tab-content" id="fc-tab-performance" style="display: none;">
         <div class="fc-performance-section">
           <div class="fc-setting-group">
             <h4><span>🎨</span> Visual Effects</h4>
             
             <div class="fc-setting-item">
-              <span class="fc-setting-label">
-                <span>🔄</span> Enable All Animations
-              </span>
+              <span class="fc-setting-label"><span>🔄</span> Enable All Animations</span>
               <label class="fc-toggle">
                 <input type="checkbox" id="fc-toggle-animations" ${currentConfig.animationsEnabled ? 'checked' : ''}>
                 <span class="fc-toggle-slider"></span>
@@ -675,9 +648,7 @@
             <div class="fc-setting-description">Master switch for all animations</div>
             
             <div class="fc-setting-item">
-              <span class="fc-setting-label">
-                <span>🔢</span> Number Roll Effect
-              </span>
+              <span class="fc-setting-label"><span>🔢</span> Number Roll Effect</span>
               <label class="fc-toggle">
                 <input type="checkbox" id="fc-toggle-number-roll" ${currentConfig.numberRollEnabled ? 'checked' : ''}>
                 <span class="fc-toggle-slider"></span>
@@ -686,9 +657,7 @@
             <div class="fc-setting-description">Smooth counting animation when numbers change</div>
             
             <div class="fc-setting-item">
-              <span class="fc-setting-label">
-                <span>🦆</span> Duck Dance at 100%
-              </span>
+              <span class="fc-setting-label"><span>🦆</span> Duck Dance at 100%</span>
               <label class="fc-toggle">
                 <input type="checkbox" id="fc-toggle-duck-dance" ${currentConfig.duckDanceEnabled ? 'checked' : ''}>
                 <span class="fc-toggle-slider"></span>
@@ -697,9 +666,7 @@
             <div class="fc-setting-description">Celebration animation when reaching 100%</div>
             
             <div class="fc-setting-item">
-              <span class="fc-setting-label">
-                <span>💫</span> Border Pulse Effect
-              </span>
+              <span class="fc-setting-label"><span>💫</span> Border Pulse Effect</span>
               <label class="fc-toggle">
                 <input type="checkbox" id="fc-toggle-border-pulse" ${currentConfig.borderPulseEnabled ? 'checked' : ''}>
                 <span class="fc-toggle-slider"></span>
@@ -708,24 +675,20 @@
             <div class="fc-setting-description">Pulsing glow effect on progress borders</div>
             
             <div class="fc-setting-item">
-              <span class="fc-setting-label">
-                <span>😊</span> Show Progress Emojis
-              </span>
+              <span class="fc-setting-label"><span>😊</span> Show Progress Emojis</span>
               <label class="fc-toggle">
                 <input type="checkbox" id="fc-toggle-emojis" ${currentConfig.showEmojis ? 'checked' : ''}>
                 <span class="fc-toggle-slider"></span>
               </label>
             </div>
-            <div class="fc-setting-description">Display emojis based on progress (🥚, 🐢, 🚀, etc.)</div>
+            <div class="fc-setting-description">Display emojis based on progress</div>
           </div>
           
           <div class="fc-setting-group">
             <h4><span>⚙️</span> Performance Settings</h4>
             
             <div class="fc-setting-item">
-              <span class="fc-setting-label">
-                <span>🎯</span> Decimal Precision
-              </span>
+              <span class="fc-setting-label"><span>🎯</span> Decimal Precision</span>
               <div class="fc-slider-container">
                 <input type="range" id="fc-slider-precision" class="fc-slider" min="0" max="6" value="${currentConfig.decimalPrecision}" step="1">
                 <span class="fc-slider-value" id="fc-precision-value">${currentConfig.decimalPrecision}</span>
@@ -734,21 +697,17 @@
             <div class="fc-setting-description">Number of decimal places to show (0-6)</div>
             
             <div class="fc-setting-item">
-              <span class="fc-setting-label">
-                <span>⏱️</span> Update Speed
-              </span>
+              <span class="fc-setting-label"><span>⏱️</span> Update Speed</span>
               <select id="fc-select-speed" class="fc-select">
                 <option value="slow" ${currentConfig.updateSpeed === 'slow' ? 'selected' : ''}>Slow</option>
                 <option value="normal" ${currentConfig.updateSpeed === 'normal' ? 'selected' : ''}>Normal</option>
                 <option value="fast" ${currentConfig.updateSpeed === 'fast' ? 'selected' : ''}>Fast</option>
               </select>
             </div>
-            <div class="fc-setting-description">How frequently progress updates (fast may use more CPU)</div>
+            <div class="fc-setting-description">How frequently progress updates</div>
           </div>
           
-          <button class="fc-save-btn" id="fc-save-settings">
-            <span>💾</span> Save Settings
-          </button>
+          <button class="fc-save-btn" id="fc-save-settings"><span>💾</span> Save Settings</button>
         </div>
       </div>
       
@@ -757,104 +716,25 @@
         <div class="fc-support-section">
           <div class="fc-support-card">
             <h4><span>❓</span> Frequently Asked Questions</h4>
-            
-            <div class="fc-faq-item" id="faq-1">
-              <div class="fc-faq-question">
-                <span class="fc-faq-question-content">
-                  <span>🦆</span> Why isn't my progress showing?
-                </span>
-                <span class="fc-faq-arrow">▶</span>
-              </div>
-              <div class="fc-faq-answer">
-                Make sure you're on a page with progress bars (like offers). The script automatically detects them. Try refreshing the page.
-              </div>
-            </div>
-            
-            <div class="fc-faq-item" id="faq-2">
-              <div class="fc-faq-question">
-                <span class="fc-faq-question-content">
-                  <span>🎨</span> Can I change the colors?
-                </span>
-                <span class="fc-faq-arrow">▶</span>
-              </div>
-              <div class="fc-faq-answer">
-                Coming soon! Check the Performance tab for animation settings. Color customization will be in a future update.
-              </div>
-            </div>
-            
-            <div class="fc-faq-item" id="faq-3">
-              <div class="fc-faq-question">
-                <span class="fc-faq-question-content">
-                  <span>⚡</span> The script is slowing down my browser
-                </span>
-                <span class="fc-faq-arrow">▶</span>
-              </div>
-              <div class="fc-faq-answer">
-                Go to the Performance tab and disable animations or reduce update speed. You can also turn off individual effects.
-              </div>
-            </div>
-            
-            <div class="fc-faq-item" id="faq-4">
-              <div class="fc-faq-question">
-                <span class="fc-faq-question-content">
-                  <span>🔄</span> How do I reset settings?
-                </span>
-                <span class="fc-faq-arrow">▶</span>
-              </div>
-              <div class="fc-faq-answer">
-                Click "Reset to Defaults" in the Performance tab, or clear your browser's localStorage for this site.
-              </div>
-            </div>
+            <div class="fc-faq-item"><div class="fc-faq-question"><span class="fc-faq-question-content"><span>🦆</span> Why isn't my progress showing?</span><span class="fc-faq-arrow">▶</span></div><div class="fc-faq-answer">Make sure you're on a page with progress bars (like offers). The script automatically detects them. Try refreshing the page.</div></div>
+            <div class="fc-faq-item"><div class="fc-faq-question"><span class="fc-faq-question-content"><span>🎨</span> Can I change the colors?</span><span class="fc-faq-arrow">▶</span></div><div class="fc-faq-answer">Coming soon! Check the Performance tab for animation settings. Color customization will be in a future update.</div></div>
+            <div class="fc-faq-item"><div class="fc-faq-question"><span class="fc-faq-question-content"><span>⚡</span> The script is slowing down my browser</span><span class="fc-faq-arrow">▶</span></div><div class="fc-faq-answer">Go to the Performance tab and disable animations or reduce update speed. You can also turn off individual effects.</div></div>
+            <div class="fc-faq-item"><div class="fc-faq-question"><span class="fc-faq-question-content"><span>🔄</span> How do I reset settings?</span><span class="fc-faq-arrow">▶</span></div><div class="fc-faq-answer">Click "Reset to Defaults" in the Performance tab, or clear your browser's localStorage for this site.</div></div>
           </div>
           
           <div class="fc-support-card">
             <h4><span>💬</span> Need More Help?</h4>
-            
-            <a href="https://discord.gg/Y3zZrnEEN4" target="_blank" class="fc-discord-link">
-              <span>💬</span>
-              <span style="flex: 1;">Join Freecash Discord</span>
-              <span>↗</span>
-            </a>
-            
-            <div class="fc-pm-note">
-              <strong>📨 DuckyQuack Support:</strong><br>
-              Once you're in the Freecash Discord, send a Private Message to <strong>@real_mr.duck</strong> with:
-              <ul style="margin-top: 8px; padding-left: 20px;">
-                <li>A description of your issue</li>
-                <li>Screenshots (if applicable)</li>
-                <li>Your browser name and version</li>
-              </ul>
-              I'll get back to you as soon as possible! 🦆
-            </div>
-            
+            <a href="https://discord.gg/Y3zZrnEEN4" target="_blank" class="fc-discord-link"><span>💬</span><span style="flex:1;">Join Freecash Discord</span><span>↗</span></a>
+            <div class="fc-pm-note"><strong>📨 DuckyQuack Support:</strong><br>Once you're in the Freecash Discord, send a Private Message to <strong>@real_mr.duck</strong></div>
             <div class="fc-contact-options">
-              <button class="fc-contact-btn primary" id="fc-copy-username">
-                <span>📋</span> Copy Username
-              </button>
-              <button class="fc-contact-btn secondary" id="fc-open-discord">
-                <span>💬</span> Open Discord
-              </button>
-            </div>
-          </div>
-          
-          <div class="fc-support-card">
-            <h4><span>🐛</span> Report a Bug</h4>
-            <div style="color: #d1d5db; font-size: 13px; line-height: 1.6;">
-              Found a bug? Please message me on Discord with:
-              <ul style="margin-top: 8px; padding-left: 20px;">
-                <li>What happened</li>
-                <li>What you expected to happen</li>
-                <li>Steps to reproduce</li>
-                <li>Browser and OS</li>
-              </ul>
+              <button class="fc-contact-btn primary" id="fc-copy-username"><span>📋</span> Copy Username</button>
+              <button class="fc-contact-btn secondary" id="fc-open-discord"><span>💬</span> Open Discord</button>
             </div>
           </div>
         </div>
       </div>
       
-      <div class="fc-settings-modal-footer">
-        Made with 🦆 by DuckyQuack | v3.5
-      </div>
+      <div class="fc-settings-modal-footer">Made with 🦆 by DuckyQuack | v3.5</div>
     `;
 
     document.body.appendChild(modalOverlay);
@@ -864,59 +744,80 @@
     modal.style.display = 'none';
     modalOverlay.style.display = 'none';
 
-    // Function to load settings into UI
+    // Cache DOM elements for better performance
+    function getCachedElement(id) {
+      if (!cachedElements[id]) {
+        cachedElements[id] = document.getElementById(id);
+      }
+      return cachedElements[id];
+    }
+
+    // Debounce function to limit function calls
+    function debounce(func, wait) {
+      let timeout;
+      return function executedFunction(...args) {
+        const later = () => {
+          clearTimeout(timeout);
+          func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+      };
+    }
+
+    // Function to load settings into UI (optimized)
     function loadSettingsIntoUI() {
-      // Get the latest config from main script or localStorage
       const latestStored = loadConfigFromStorage();
       const latestConfig = window.userConfig || latestStored || currentConfig;
       
-      // Update all toggle switches
-      const animationsToggle = document.getElementById('fc-toggle-animations');
-      if (animationsToggle) animationsToggle.checked = latestConfig.animationsEnabled !== false;
-      
-      const numberRollToggle = document.getElementById('fc-toggle-number-roll');
-      if (numberRollToggle) numberRollToggle.checked = latestConfig.numberRollEnabled !== false;
-      
-      const duckDanceToggle = document.getElementById('fc-toggle-duck-dance');
-      if (duckDanceToggle) duckDanceToggle.checked = latestConfig.duckDanceEnabled !== false;
-      
-      const borderPulseToggle = document.getElementById('fc-toggle-border-pulse');
-      if (borderPulseToggle) borderPulseToggle.checked = latestConfig.borderPulseEnabled !== false;
-      
-      const emojisToggle = document.getElementById('fc-toggle-emojis');
-      if (emojisToggle) emojisToggle.checked = latestConfig.showEmojis !== false;
-      
-      const precisionSlider = document.getElementById('fc-slider-precision');
-      if (precisionSlider) {
-        precisionSlider.value = latestConfig.decimalPrecision || 4;
-        updatePrecisionDisplay();
-      }
-      
-      const speedSelect = document.getElementById('fc-select-speed');
-      if (speedSelect) {
-        speedSelect.value = latestConfig.updateSpeed || 'normal';
-      }
-    }
-
-    // FAQ Accordion functionality
-    function initFaqAccordion() {
-      const faqItems = document.querySelectorAll('.fc-faq-item');
-      
-      faqItems.forEach(item => {
-        const question = item.querySelector('.fc-faq-question');
+      // Batch DOM updates
+      requestAnimationFrame(() => {
+        const animationsToggle = getCachedElement('fc-toggle-animations');
+        if (animationsToggle) animationsToggle.checked = latestConfig.animationsEnabled !== false;
         
-        // Remove existing listeners to prevent duplicates
-        question.removeEventListener('click', question.clickHandler);
+        const numberRollToggle = getCachedElement('fc-toggle-number-roll');
+        if (numberRollToggle) numberRollToggle.checked = latestConfig.numberRollEnabled !== false;
         
-        question.clickHandler = () => {
-          item.classList.toggle('expanded');
-        };
+        const duckDanceToggle = getCachedElement('fc-toggle-duck-dance');
+        if (duckDanceToggle) duckDanceToggle.checked = latestConfig.duckDanceEnabled !== false;
         
-        question.addEventListener('click', question.clickHandler);
+        const borderPulseToggle = getCachedElement('fc-toggle-border-pulse');
+        if (borderPulseToggle) borderPulseToggle.checked = latestConfig.borderPulseEnabled !== false;
+        
+        const emojisToggle = getCachedElement('fc-toggle-emojis');
+        if (emojisToggle) emojisToggle.checked = latestConfig.showEmojis !== false;
+        
+        const precisionSlider = getCachedElement('fc-slider-precision');
+        if (precisionSlider) {
+          precisionSlider.value = latestConfig.decimalPrecision || 4;
+          updatePrecisionDisplay();
+        }
+        
+        const speedSelect = getCachedElement('fc-select-speed');
+        if (speedSelect) {
+          speedSelect.value = latestConfig.updateSpeed || 'normal';
+        }
       });
     }
 
-    // Tab switching functionality
+    // FAQ Accordion functionality (optimized with event delegation)
+    function initFaqAccordion() {
+      const supportTab = document.getElementById('fc-tab-support');
+      if (!supportTab) return;
+      
+      // Use event delegation instead of attaching to each item
+      supportTab.addEventListener('click', (e) => {
+        const question = e.target.closest('.fc-faq-question');
+        if (!question) return;
+        
+        const faqItem = question.closest('.fc-faq-item');
+        if (faqItem) {
+          faqItem.classList.toggle('expanded');
+        }
+      });
+    }
+
+    // Tab switching functionality (optimized)
     const tabs = modal.querySelectorAll('.fc-settings-tab');
     const mainTab = document.getElementById('fc-tab-main');
     const perfTab = document.getElementById('fc-tab-performance');
@@ -927,26 +828,31 @@
         tabs.forEach(t => t.classList.remove('active'));
         tab.classList.add('active');
         
-        mainTab.style.display = 'none';
-        perfTab.style.display = 'none';
-        supportTab.style.display = 'none';
-        
-        const tabName = tab.dataset.tab;
-        if (tabName === 'main') {
-          mainTab.style.display = 'block';
-        } else if (tabName === 'performance') {
-          perfTab.style.display = 'block';
-          // Load latest settings when switching to performance tab
-          loadSettingsIntoUI();
-          updatePrecisionDisplay();
-        } else if (tabName === 'support') {
-          supportTab.style.display = 'block';
-          setTimeout(initFaqAccordion, 50);
-        }
+        // Batch DOM updates
+        requestAnimationFrame(() => {
+          mainTab.style.display = 'none';
+          perfTab.style.display = 'none';
+          supportTab.style.display = 'none';
+          
+          const tabName = tab.dataset.tab;
+          if (tabName === 'main') {
+            mainTab.style.display = 'block';
+          } else if (tabName === 'performance') {
+            perfTab.style.display = 'block';
+            // Load settings and update precision in next frame
+            requestAnimationFrame(() => {
+              loadSettingsIntoUI();
+              updatePrecisionDisplay();
+            });
+          } else if (tabName === 'support') {
+            supportTab.style.display = 'block';
+            initFaqAccordion();
+          }
+        });
       });
     });
 
-    // Performance tab helpers
+    // Performance tab helpers (optimized)
     const precisionSlider = document.getElementById('fc-slider-precision');
     const precisionValue = document.getElementById('fc-precision-value');
     
@@ -957,28 +863,28 @@
     }
     
     if (precisionSlider) {
-      precisionSlider.addEventListener('input', updatePrecisionDisplay);
+      // Debounce the input event for better performance
+      precisionSlider.addEventListener('input', debounce(updatePrecisionDisplay, 16));
     }
 
-    // Save settings button
+    // Save settings button (optimized)
     const saveBtn = document.getElementById('fc-save-settings');
     if (saveBtn) {
       saveBtn.addEventListener('click', () => {
         // Gather all settings
         const newConfig = {
-          animationsEnabled: document.getElementById('fc-toggle-animations')?.checked ?? true,
-          numberRollEnabled: document.getElementById('fc-toggle-number-roll')?.checked ?? true,
-          duckDanceEnabled: document.getElementById('fc-toggle-duck-dance')?.checked ?? true,
-          borderPulseEnabled: document.getElementById('fc-toggle-border-pulse')?.checked ?? true,
-          showEmojis: document.getElementById('fc-toggle-emojis')?.checked ?? true,
-          decimalPrecision: parseInt(document.getElementById('fc-slider-precision')?.value ?? '4'),
-          updateSpeed: document.getElementById('fc-select-speed')?.value ?? 'normal'
+          animationsEnabled: getCachedElement('fc-toggle-animations')?.checked ?? true,
+          numberRollEnabled: getCachedElement('fc-toggle-number-roll')?.checked ?? true,
+          duckDanceEnabled: getCachedElement('fc-toggle-duck-dance')?.checked ?? true,
+          borderPulseEnabled: getCachedElement('fc-toggle-border-pulse')?.checked ?? true,
+          showEmojis: getCachedElement('fc-toggle-emojis')?.checked ?? true,
+          decimalPrecision: parseInt(getCachedElement('fc-slider-precision')?.value ?? '4'),
+          updateSpeed: getCachedElement('fc-select-speed')?.value ?? 'normal'
         };
         
         // Save to localStorage
         try {
           localStorage.setItem('freecashProgressConfig', JSON.stringify(newConfig));
-          console.log('💾 Settings saved to localStorage:', newConfig);
         } catch (e) {
           console.error('Error saving to localStorage:', e);
         }
@@ -988,19 +894,16 @@
           window.updateConfig(newConfig);
         }
         
-        // Also update window.userConfig if it exists
         if (window.userConfig) {
           Object.assign(window.userConfig, newConfig);
         }
         
         // Show save confirmation
-        const originalText = saveBtn.innerHTML;
+        const originalHTML = saveBtn.innerHTML;
         saveBtn.innerHTML = '<span>✅</span> Saved!';
-        saveBtn.style.background = 'linear-gradient(135deg, #059669, #047857)';
         
         setTimeout(() => {
-          saveBtn.innerHTML = originalText;
-          saveBtn.style.background = 'linear-gradient(135deg, #10b981, #059669)';
+          saveBtn.innerHTML = originalHTML;
         }, 2000);
       });
     }
@@ -1010,10 +913,10 @@
     if (copyUsernameBtn) {
       copyUsernameBtn.addEventListener('click', () => {
         navigator.clipboard.writeText('@real_mr.duck').then(() => {
-          const originalText = copyUsernameBtn.innerHTML;
+          const originalHTML = copyUsernameBtn.innerHTML;
           copyUsernameBtn.innerHTML = '<span>✅</span> Copied!';
           setTimeout(() => {
-            copyUsernameBtn.innerHTML = originalText;
+            copyUsernameBtn.innerHTML = originalHTML;
           }, 2000);
         });
       });
@@ -1026,35 +929,31 @@
       });
     }
 
-    // Toggle modal function (exposed globally for main script)
+    // Toggle modal function (optimized)
     window.toggleSettingsModal = function(show) {
       const isVisible = show !== undefined ? show : modal.style.display === 'none';
       
-      if (isVisible) {
-        // Load the latest settings before showing modal
-        loadSettingsIntoUI();
-        
-        modal.classList.remove('closing');
-        modalOverlay.classList.remove('closing');
-        modal.style.display = 'block';
-        modalOverlay.style.display = 'block';
-        
-        document.body.classList.add('fc-modal-open');
-        
-        const perfTabContent = document.getElementById('fc-tab-performance');
-        if (perfTabContent.style.display === 'block') {
-          updatePrecisionDisplay();
+      requestAnimationFrame(() => {
+        if (isVisible) {
+          loadSettingsIntoUI();
+          
+          modal.classList.remove('closing');
+          modalOverlay.classList.remove('closing');
+          modal.style.display = 'block';
+          modalOverlay.style.display = 'block';
+          
+          document.body.classList.add('fc-modal-open');
+        } else {
+          modal.classList.add('closing');
+          modalOverlay.classList.add('closing');
+          
+          setTimeout(() => {
+            modal.style.display = 'none';
+            modalOverlay.style.display = 'none';
+            document.body.classList.remove('fc-modal-open');
+          }, 200);
         }
-      } else {
-        modal.classList.add('closing');
-        modalOverlay.classList.add('closing');
-        
-        setTimeout(() => {
-          modal.style.display = 'none';
-          modalOverlay.style.display = 'none';
-          document.body.classList.remove('fc-modal-open');
-        }, 300);
-      }
+      });
     };
 
     // Event listeners
