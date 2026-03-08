@@ -2,6 +2,10 @@
 
 A Tampermonkey script that adds beautiful progress indicators to Freecash.com with dynamic colors, smooth animations, and a special duck dance at 100%!
 
+## 📸 Preview
+
+<img width="1474" height="794" alt="image" src="https://github.com/user-attachments/assets/a1630f4a-5958-48fb-8a89-58e7e83dea80" />
+
 ## ✨ Features
 
 - 🎨 **Colored borders** based on progress (red → orange → green)
