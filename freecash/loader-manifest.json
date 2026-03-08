@@ -1,7 +1,7 @@
 {
   "scripts": [
-    "settings.js",
     "loading.js",
+    "settings.js",
     "main.js"
   ]
 }
