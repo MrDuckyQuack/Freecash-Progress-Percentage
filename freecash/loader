@@ -1,4 +1,9 @@
 // ==UserScript==
+// @name         Freecash Progress Loader - DuckyQuack
+// @namespace    freecash-loader-ducky
+// @version      1.2.2
+// @description  Loads DuckyQuack's Freecash progress script from GitHub
+// @author       DuckyQuack
 // @match        https://freecash.com/*
 // @match        https://www.freecash.com/*
 // @run-at       document-start
