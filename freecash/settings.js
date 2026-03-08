@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Freecash Progress Settings UI
 // @namespace    freecash-settings-ui
-// @version      1.6.2
+// @version      1.6.3
 // @description  Settings UI for Freecash Progress Script with auto-save
 // @author       DuckyQuack
 // @match        https://freecash.com/*
@@ -147,7 +147,7 @@
         -webkit-overflow-scrolling: touch;
       }
 
-      /* Main Tab Styles */
+      /* Main Tab Styles - COMPACT */
       .fc-main-section {
         padding: 5px 0;
       }
@@ -158,52 +158,55 @@
         padding: 15px;
         margin-bottom: 15px;
         border: 1px solid rgba(16,185,129,0.2);
+        display: flex;
+        flex-direction: column;
+        height: 100%;
       }
 
       .fc-main-card h4 {
-        margin: 0 0 15px 0;
+        margin: 0 0 12px 0;
         color: #10b981;
-        font-size: 16px;
+        font-size: 15px;
         display: flex;
         align-items: center;
-        gap: 8px;
+        gap: 6px;
         border-bottom: 1px solid rgba(16,185,129,0.3);
-        padding-bottom: 8px;
+        padding-bottom: 6px;
       }
 
       .fc-main-card .fc-setting-item {
         display: flex;
         align-items: center;
         justify-content: space-between;
-        margin-bottom: 12px;
-        padding: 5px 0;
-        min-height: 40px;
+        margin-bottom: 8px;
+        padding: 3px 0;
+        min-height: 32px;
       }
 
       .fc-main-card .fc-setting-label {
         display: flex;
         align-items: center;
-        gap: 8px;
+        gap: 6px;
         color: #e5e7eb;
-        font-size: 14px;
+        font-size: 13px;
       }
 
       .fc-main-card .fc-setting-label span {
-        font-size: 1.2em;
+        font-size: 1.1em;
       }
 
       .fc-main-card .fc-setting-description {
-        font-size: 12px;
+        font-size: 11px;
         color: #9ca3af;
-        margin-top: 4px;
-        padding-left: 32px;
-        margin-bottom: 12px;
+        margin-top: 2px;
+        padding-left: 28px;
+        margin-bottom: 8px;
       }
 
       /* Coming Soon Duck (kept for charm) */
       .fc-coming-soon-duck {
-        font-size: 48px;
-        margin-bottom: 15px;
+        font-size: 40px;
+        margin: 10px 0;
         animation: duckFloat 2s ease-in-out infinite;
         opacity: 0.5;
       }
@@ -246,13 +249,14 @@
       .fc-faq-question {
         font-weight: 600;
         color: #10b981;
-        padding: 12px 15px;
+        padding: 10px 12px;
         display: flex;
         align-items: center;
         justify-content: space-between;
         gap: 10px;
         cursor: pointer;
         user-select: none;
+        font-size: 13px;
       }
 
       .fc-faq-question:hover {
@@ -262,11 +266,11 @@
       .fc-faq-question-content {
         display: flex;
         align-items: center;
-        gap: 8px;
+        gap: 6px;
       }
 
       .fc-faq-arrow {
-        font-size: 12px;
+        font-size: 11px;
         transition: transform 0.2s ease;
         color: #10b981;
       }
@@ -281,13 +285,14 @@
         transition: max-height 0.2s ease;
         background: rgba(0,0,0,0.3);
         color: #d1d5db;
-        font-size: 13px;
+        font-size: 12px;
         line-height: 1.5;
+        padding: 0 12px;
       }
 
       .fc-faq-item.expanded .fc-faq-answer {
         max-height: 200px;
-        padding: 12px 15px;
+        padding: 10px 12px;
       }
 
       .fc-discord-link {
@@ -343,6 +348,7 @@
         justify-content: center;
         gap: 6px;
         will-change: transform;
+        font-size: 13px;
       }
 
       .fc-contact-btn.primary {
@@ -412,20 +418,27 @@
         font-size: 1.2em;
       }
 
-      /* Circular Toggle Switch - Optimized */
+      /* Circular Toggle Switch - Optimized - SMALLER for main tab */
       .fc-toggle {
         position: relative;
         display: inline-block;
-        width: 52px;
-        height: 28px;
+        width: 46px;
+        height: 24px;
         flex-shrink: 0;
       }
 
-      .fc-toggle input {
-        opacity: 0;
-        width: 0;
-        height: 0;
-        position: absolute;
+      .fc-toggle-sm {
+        width: 40px;
+        height: 20px;
+      }
+
+      .fc-toggle-sm .fc-toggle-slider:before {
+        height: 18px;
+        width: 18px;
+      }
+
+      .fc-toggle-sm input:checked + .fc-toggle-slider:before {
+        transform: translateX(20px);
       }
 
       .fc-toggle-slider {
@@ -443,8 +456,8 @@
       .fc-toggle-slider:before {
         position: absolute;
         content: "";
-        height: 24px;
-        width: 24px;
+        height: 20px;
+        width: 20px;
         left: 2px;
         bottom: 2px;
         background-color: white;
@@ -458,7 +471,7 @@
       }
 
       input:checked + .fc-toggle-slider:before {
-        transform: translateX(24px);
+        transform: translateX(22px);
       }
 
       /* Select Dropdown - Optimized */
@@ -545,12 +558,13 @@
         font-weight: 600;
         cursor: pointer;
         transition: transform 0.2s ease;
-        margin-top: 10px;
+        margin-top: 15px;
         display: flex;
         align-items: center;
         justify-content: center;
         gap: 8px;
         will-change: transform;
+        font-size: 14px;
       }
 
       .fc-save-btn:hover {
@@ -595,7 +609,7 @@
         to { opacity: 1; }
       }
 
-      /* Settings Button Styles */
+      /* Settings Button Styles - UPDATED: White gear, no border */
       .fc-settings-btn {
         position: fixed !important;
         bottom: 80px !important;
@@ -604,24 +618,35 @@
         height: 50px !important;
         border-radius: 50% !important;
         background: #10b981 !important;
-        border: 3px solid white !important;
+        border: none !important;
+        outline: none !important;
+        box-shadow: 0 4px 15px rgba(16,185,129,0.4) !important;
         color: white !important;
-        font-size: 24px !important;
+        font-size: 28px !important;
         cursor: pointer !important;
         display: flex !important;
         align-items: center !important;
         justify-content: center !important;
-        box-shadow: 0 4px 15px rgba(16,185,129,0.4) !important;
         z-index: 999997 !important;
-        transition: transform 0.2s ease, box-shadow 0.2s ease !important;
+        transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease !important;
         animation: settingsButtonAppear 0.3s ease !important;
-        backdrop-filter: none !important;
-        -webkit-backdrop-filter: none !important;
-        filter: none !important;
-        -webkit-filter: none !important;
         padding: 0 !important;
         margin: 0 !important;
         line-height: 1 !important;
+        text-decoration: none !important;
+        -webkit-appearance: none !important;
+        -moz-appearance: none !important;
+        appearance: none !important;
+      }
+
+      .fc-settings-btn .gear-icon {
+        color: white !important;
+        display: inline-block !important;
+        filter: none !important;
+        -webkit-filter: none !important;
+        opacity: 1 !important;
+        text-shadow: none !important;
+        font-weight: normal !important;
       }
 
       .fc-settings-btn:hover {
@@ -630,12 +655,25 @@
         background: #059669 !important;
       }
 
+      .fc-settings-btn:active {
+        transform: scale(0.95) rotate(180deg) !important;
+      }
+
+      .fc-settings-btn:focus {
+        outline: none !important;
+        border: none !important;
+        box-shadow: 0 4px 15px rgba(16,185,129,0.4) !important;
+      }
+
       @keyframes settingsButtonAppear {
-        from {
+        0% {
           opacity: 0;
           transform: scale(0) rotate(-180deg);
         }
-        to {
+        70% {
+          transform: scale(1.1) rotate(10deg);
+        }
+        100% {
           opacity: 1;
           transform: scale(1) rotate(0);
         }
@@ -643,10 +681,6 @@
 
       /* When modal is open */
       body.fc-modal-open .fc-settings-btn {
-        backdrop-filter: none !important;
-        -webkit-backdrop-filter: none !important;
-        filter: none !important;
-        -webkit-filter: none !important;
         display: flex !important;
         visibility: visible !important;
         opacity: 1 !important;
@@ -654,11 +688,11 @@
       }
     `);
 
-    // Create settings button
+    // Create settings button with white gear
     const settingsBtn = document.createElement('button');
     settingsBtn.className = 'fc-settings-btn';
     settingsBtn.id = 'fc-settings-btn';
-    settingsBtn.innerHTML = '⚙️';
+    settingsBtn.innerHTML = '<span class="gear-icon">⚙️</span>';
     settingsBtn.setAttribute('aria-label', 'Open Settings');
     settingsBtn.setAttribute('title', 'DuckyQuack Settings');
     document.body.appendChild(settingsBtn);
@@ -699,10 +733,10 @@
       showEmojis: true,
       decimalPrecision: 4,
       updateSpeed: 'normal',
-      showDuckWelcome: true // NEW: Duck welcome screen toggle (default: enabled)
+      showDuckWelcome: true // Duck welcome screen toggle (default: enabled)
     };
 
-    // Build modal with tabs - UPDATED Main tab with save button
+    // Build modal with tabs - UPDATED Main tab with compact layout and save button at bottom
     modal.innerHTML = `
       <div class="fc-settings-modal-header">
         <h3><span>🦆</span> DuckyQuack Settings</h3>
@@ -715,7 +749,7 @@
         <button class="fc-settings-tab" data-tab="support"><span>❓</span> Support</button>
       </div>
       
-      <!-- Main Tab Content - UPDATED with Duck Welcome Toggle and Save Button -->
+      <!-- Main Tab Content - COMPACT with save button at bottom -->
       <div class="fc-settings-tab-content" id="fc-tab-main">
         <div class="fc-main-section">
           <div class="fc-main-card">
@@ -725,26 +759,26 @@
               <span class="fc-setting-label">
                 <span>🎬</span> Show Duck Welcome Screen
               </span>
-              <label class="fc-toggle">
+              <label class="fc-toggle fc-toggle-sm">
                 <input type="checkbox" id="fc-toggle-duck-welcome" ${currentConfig.showDuckWelcome !== false ? 'checked' : ''}>
                 <span class="fc-toggle-slider"></span>
               </label>
             </div>
-            <div class="fc-setting-description">
-              Show a cute duck loading screen with floating ducks and balloons when you first visit the site
+            <div class="fc-setting-description" style="padding-left: 28px; font-size: 11px;">
+              Show duck loading screen with floating ducks and balloons
             </div>
             
-            <!-- SAVE BUTTON ADDED HERE -->
-            <button class="fc-save-btn" id="fc-save-main-settings" style="margin-top: 20px;">
-              <span>💾</span> Save Welcome Screen Setting
-            </button>
-            
-            <div style="margin-top: 20px; text-align: center; opacity: 0.7;">
+            <div style="margin-top: 15px; text-align: center; opacity: 0.5;">
               <div class="fc-coming-soon-duck">🦆✨</div>
-              <div style="color: #9ca3af; font-size: 13px;">More main features coming soon!</div>
+              <div style="color: #9ca3af; font-size: 11px;">More main features coming soon!</div>
             </div>
           </div>
         </div>
+        
+        <!-- Save button at bottom of main tab (like performance tab) -->
+        <button class="fc-save-btn" id="fc-save-main-settings">
+          <span>💾</span> Save Main Settings
+        </button>
       </div>
       
       <!-- Performance Tab Content - Optimized structure -->
@@ -822,7 +856,7 @@
             <div class="fc-setting-description">How frequently progress updates</div>
           </div>
           
-          <button class="fc-save-btn" id="fc-save-settings"><span>💾</span> Save Settings</button>
+          <button class="fc-save-btn" id="fc-save-settings"><span>💾</span> Save Performance Settings</button>
         </div>
       </div>
       
@@ -1165,7 +1199,7 @@
     // Initial load of settings
     loadSettingsIntoUI();
 
-    console.log('⚙️ Settings UI initialized with button and duck welcome toggle + save button');
+    console.log('⚙️ Settings UI initialized with white gear, no border, and compact main tab with save button at bottom');
   }
 
   // Start waiting for main script
