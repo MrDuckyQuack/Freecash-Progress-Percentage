@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Freecash Duck Welcome
 // @namespace    freecash-duck-welcome
-// @version      1.4
+// @version      1.4.2
 // @description  Shows a cute duck loading screen on Freecash after page load and navigation
 // @author       DuckyQuack
 // @match        https://freecash.com/*
@@ -14,7 +14,7 @@
   'use strict';
 
   const duckMessages = [
-    "WELCOME TO FREECASH!",
+    "WELCOME TO DUCKCASH!",
     "DUCKYQUACK WAS HERE",
     "QUACK QUACK!",
     "READY TO EARN?",
@@ -22,7 +22,7 @@
     "DUCK MODE: ACTIVATED",
     "LOADING DUCKY MAGIC",
     "WADDLE YOU WAITING FOR?",
-    "DUCK SEASON!",
+    "MONEH SEASON!",
     "FREE MONEY DUCK"
   ];
 
@@ -157,7 +157,7 @@
     el.innerHTML = `
       <span class="duck-emoji">${emoji}</span>
       <div class="duck-title">🦆 ${msg}</div>
-      <div class="duck-sub">Making Freecash ducky since 2024</div>
+      <div class="duck-sub">Quack Quack!</div>
       <div class="duck-bar-wrap">
         <div class="duck-bar-fill"></div>
       </div>
@@ -183,7 +183,7 @@
   }
 
   function triggerAfterDelay() {
-    setTimeout(showDuck, 2000);
+    setTimeout(showDuck, 10);
   }
 
   // ── Initial page load ──────────────────────────────────────────────
