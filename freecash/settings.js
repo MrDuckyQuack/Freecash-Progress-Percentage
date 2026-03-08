@@ -788,7 +788,7 @@
           <div class="fc-support-card">
             <h4><span>💬</span> Need More Help?</h4>
             
-            <a href="https://discord.gg/freecash" target="_blank" class="fc-discord-link">
+            <a href="https://discord.gg/Y3zZrnEEN4" target="_blank" class="fc-discord-link">
               <span>💬</span>
               <span style="flex: 1;">Join Freecash Discord</span>
               <span>↗</span>
@@ -796,7 +796,7 @@
             
             <div class="fc-pm-note">
               <strong>📨 DuckyQuack Support:</strong><br>
-              Once you're in the Freecash Discord, send a Private Message to <strong>@DuckyQuack</strong> with:
+              Once you're in the Freecash Discord, send a Private Message to <strong>@real_mr.duck</strong> with:
               <ul style="margin-top: 8px; padding-left: 20px;">
                 <li>A description of your issue</li>
                 <li>Screenshots (if applicable)</li>
@@ -933,7 +933,7 @@
     const copyUsernameBtn = document.getElementById('fc-copy-username');
     if (copyUsernameBtn) {
       copyUsernameBtn.addEventListener('click', () => {
-        navigator.clipboard.writeText('@DuckyQuack').then(() => {
+        navigator.clipboard.writeText('@real_mr.duck').then(() => {
           const originalText = copyUsernameBtn.innerHTML;
           copyUsernameBtn.innerHTML = '<span>✅</span> Copied!';
           setTimeout(() => {
@@ -946,7 +946,7 @@
     const openDiscordBtn = document.getElementById('fc-open-discord');
     if (openDiscordBtn) {
       openDiscordBtn.addEventListener('click', () => {
-        window.open('https://discord.gg/freecash', '_blank');
+        window.open('https://discord.gg/Y3zZrnEEN4', '_blank');
       });
     }
 
