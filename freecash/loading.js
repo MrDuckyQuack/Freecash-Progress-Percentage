@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         Freecash Duck Welcome
 // @namespace    freecash-duck-welcome
-// @version      1.4.3
-// @description  Shows a cute duck loading screen on Freecash after page load and navigation
+// @version      1.5.0
+// @description  Shows a cute duck loading screen on Freecash with floating ducks and balloons
 // @author       DuckyQuack
 // @match        https://freecash.com/*
 // @match        https://www.freecash.com/*
@@ -27,6 +27,7 @@
   ];
 
   const duckEmojis = ["🦆", "🦆✨", "🦆🌟", "🦆💫", "🦆⚡", "🦆🌈", "🦆🔥", "🦆💦", "🐥", "🦆🦆"];
+  const balloonEmojis = ["🎈", "🎈🎈", "🎈✨", "🎈🌟", "🎈⭐"];
 
   GM_addStyle(`
     #duck-welcome-screen {
@@ -44,6 +45,7 @@
       opacity: 0 !important;
       transition: opacity 0.4s ease !important;
       pointer-events: all !important;
+      overflow: hidden !important;
     }
 
     #duck-welcome-screen.duck-visible {
@@ -55,6 +57,66 @@
       pointer-events: none !important;
     }
 
+    /* Floating elements container */
+    .duck-float-container {
+      position: absolute !important;
+      top: 0 !important;
+      left: 0 !important;
+      width: 100% !important;
+      height: 100% !important;
+      pointer-events: none !important;
+      z-index: 1 !important;
+    }
+    
+    /* Main content (stays above floats) */
+    .duck-main-content {
+      position: relative !important;
+      z-index: 2 !important;
+      display: flex !important;
+      flex-direction: column !important;
+      align-items: center !important;
+      justify-content: center !important;
+      width: 100% !important;
+      height: 100% !important;
+    }
+    
+    /* Floating duck styles */
+    .duck-float {
+      position: absolute !important;
+      font-size: 40px !important;
+      opacity: 0.15 !important;
+      animation: floatAround linear infinite !important;
+      user-select: none !important;
+      pointer-events: none !important;
+      filter: drop-shadow(0 5px 15px rgba(16,185,129,0.2)) !important;
+    }
+    
+    /* Floating balloon styles */
+    .balloon-float {
+      position: absolute !important;
+      font-size: 32px !important;
+      opacity: 0.2 !important;
+      animation: floatBalloon linear infinite !important;
+      user-select: none !important;
+      pointer-events: none !important;
+      filter: drop-shadow(0 5px 15px rgba(255,255,255,0.1)) !important;
+    }
+    
+    @keyframes floatAround {
+      0% { transform: translate(0, 0) rotate(0deg); }
+      25% { transform: translate(20px, -30px) rotate(5deg); }
+      50% { transform: translate(40px, 0) rotate(0deg); }
+      75% { transform: translate(20px, 30px) rotate(-5deg); }
+      100% { transform: translate(0, 0) rotate(0deg); }
+    }
+    
+    @keyframes floatBalloon {
+      0% { transform: translate(0, 0) rotate(-3deg); }
+      33% { transform: translate(-25px, -40px) rotate(3deg); }
+      66% { transform: translate(25px, -70px) rotate(-2deg); }
+      100% { transform: translate(0, 0) rotate(3deg); }
+    }
+
     .duck-emoji {
       font-size: 120px !important;
       line-height: 1 !important;
@@ -62,6 +124,8 @@
       display: block !important;
       animation: duckWobble 1.8s ease-in-out infinite !important;
       filter: drop-shadow(0 10px 30px rgba(16,185,129,0.6)) !important;
+      position: relative !important;
+      z-index: 3 !important;
     }
 
     @keyframes duckWobble {
@@ -82,6 +146,8 @@
       animation: duckShimmer 2.5s linear infinite !important;
       margin: 0 0 12px 0 !important;
       text-align: center !important;
+      position: relative !important;
+      z-index: 3 !important;
     }
 
     @keyframes duckShimmer {
@@ -95,6 +161,8 @@
       letter-spacing: 2px !important;
       font-weight: 300 !important;
       margin: 0 0 36px 0 !important;
+      position: relative !important;
+      z-index: 3 !important;
     }
 
     .duck-bar-wrap {
@@ -105,6 +173,8 @@
       overflow: hidden !important;
       border: 1px solid rgba(16,185,129,0.25) !important;
       box-shadow: 0 0 20px rgba(16,185,129,0.15) !important;
+      position: relative !important;
+      z-index: 3 !important;
     }
 
     .duck-bar-fill {
@@ -136,8 +206,75 @@
       color: #334155 !important;
       font-size: 14px !important;
       letter-spacing: 1px !important;
+      z-index: 3 !important;
     }
   `);
+
+  function createFloatingElements(container) {
+    // Create floating ducks (8 of them)
+    for (let i = 0; i < 8; i++) {
+      const duck = document.createElement('div');
+      duck.className = 'duck-float';
+      
+      // Random duck emoji
+      const randomDuck = duckEmojis[Math.floor(Math.random() * duckEmojis.length)];
+      duck.textContent = randomDuck;
+      
+      // Random starting position
+      const left = Math.random() * 90 + 5; // 5% to 95%
+      const top = Math.random() * 90 + 5;   // 5% to 95%
+      
+      // Random animation duration (15-25 seconds)
+      const duration = Math.random() * 10 + 15;
+      
+      // Random animation delay (0-10 seconds)
+      const delay = Math.random() * 10;
+      
+      // Random size variation
+      const size = Math.random() * 20 + 30; // 30-50px
+      
+      duck.style.left = left + '%';
+      duck.style.top = top + '%';
+      duck.style.animationDuration = duration + 's';
+      duck.style.animationDelay = delay + 's';
+      duck.style.fontSize = size + 'px';
+      duck.style.opacity = Math.random() * 0.1 + 0.1; // 0.1 to 0.2
+      
+      container.appendChild(duck);
+    }
+    
+    // Create floating balloons (5 of them)
+    for (let j = 0; j < 5; j++) {
+      const balloon = document.createElement('div');
+      balloon.className = 'balloon-float';
+      
+      // Random balloon emoji
+      const randomBalloon = balloonEmojis[Math.floor(Math.random() * balloonEmojis.length)];
+      balloon.textContent = randomBalloon;
+      
+      // Random starting position
+      const left = Math.random() * 90 + 5;
+      const top = Math.random() * 90 + 5;
+      
+      // Random animation duration (12-20 seconds)
+      const duration = Math.random() * 8 + 12;
+      
+      // Random animation delay
+      const delay = Math.random() * 8;
+      
+      // Random size variation
+      const size = Math.random() * 15 + 25; // 25-40px
+      
+      balloon.style.left = left + '%';
+      balloon.style.top = top + '%';
+      balloon.style.animationDuration = duration + 's';
+      balloon.style.animationDelay = delay + 's';
+      balloon.style.fontSize = size + 'px';
+      balloon.style.opacity = Math.random() * 0.1 + 0.15; // 0.15 to 0.25
+      
+      container.appendChild(balloon);
+    }
+  }
 
   let activeTimer = null;
   let isShowing = false;
@@ -159,18 +296,55 @@
     const msg   = duckMessages[Math.floor(Math.random() * duckMessages.length)];
     const emoji = duckEmojis[Math.floor(Math.random() * duckEmojis.length)];
 
+    // Build main container
     const el = document.createElement('div');
     el.id = 'duck-welcome-screen';
-    el.innerHTML = `
-      <span class="duck-emoji">${emoji}</span>
-      <div class="duck-title">🦆 ${msg}</div>
-      <div class="duck-sub">Quack Quack!</div>
-      <div class="duck-bar-wrap">
-        <div class="duck-bar-fill"></div>
-      </div>
-      <div class="duck-footer">🐤 Created by DuckyQuack</div>
-    `;
 
+    // Create floating elements container
+    const floatContainer = document.createElement('div');
+    floatContainer.className = 'duck-float-container';
+    
+    // Create main content container
+    const mainContent = document.createElement('div');
+    mainContent.className = 'duck-main-content';
+
+    // Add floating elements
+    createFloatingElements(floatContainer);
+
+    // Build main content
+    const emojiEl = document.createElement('span');
+    emojiEl.className = 'duck-emoji';
+    emojiEl.textContent = emoji;
+
+    const titleEl = document.createElement('div');
+    titleEl.className = 'duck-title';
+    titleEl.textContent = '🦆 ' + msg;
+
+    const subEl = document.createElement('div');
+    subEl.className = 'duck-sub';
+    subEl.textContent = 'Quack Quack!';
+
+    const barWrap = document.createElement('div');
+    barWrap.className = 'duck-bar-wrap';
+
+    const bar = document.createElement('div');
+    bar.className = 'duck-bar-fill';
+    bar.style.width = '0%';
+    barWrap.appendChild(bar);
+
+    const footer = document.createElement('div');
+    footer.className = 'duck-footer';
+    footer.textContent = '🐤 Created by DuckyQuack';
+
+    // Assemble everything
+    mainContent.appendChild(emojiEl);
+    mainContent.appendChild(titleEl);
+    mainContent.appendChild(subEl);
+    mainContent.appendChild(barWrap);
+    mainContent.appendChild(footer);
+    
+    el.appendChild(floatContainer);
+    el.appendChild(mainContent);
     document.body.appendChild(el);
 
     // Fade in + start progress bar on next paint
@@ -217,7 +391,6 @@
   }
 
   // ── SPA / client-side navigation (History API) ────────────────────
-  // Freecash is a React SPA — it uses pushState/replaceState for routing
   const _pushState    = history.pushState.bind(history);
   const _replaceState = history.replaceState.bind(history);
 
@@ -231,7 +404,6 @@
 
   history.replaceState = function (...args) {
     _replaceState(...args);
-    // Don't trigger on initial page load, only on subsequent navigations
     if (hasShownInitial) {
       triggerAfterDelay();
     }
@@ -239,7 +411,6 @@
 
   // Also catch back/forward navigation
   window.addEventListener('popstate', () => {
-    // Don't trigger on initial page load
     if (hasShownInitial) {
       triggerAfterDelay();
     }
