@@ -3,6 +3,7 @@
     "loading.js",
     "main.js",
     "settings.js",
-    "progress.js"
+    "progress.js",
+    "easteregg.js"
   ]
 }
