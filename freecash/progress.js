@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Freecash Progress Display
 // @namespace    freecash-progress-display
-// @version      1.0
+// @version      1.1
 // @description  Progress percentage display logic for Freecash
 // @author       DuckyQuack
 // @match        https://freecash.com/*
@@ -17,11 +17,11 @@
   const previousPercentages = new Map();
 
   function getProgressColor(percent) {
-    if (percent >= 100) return '#10b981'; // Emerald green for complete
-    if (percent >= 75) return '#10b981'; // Green for high progress
-    if (percent >= 50) return '#f59e0b'; // Orange for medium progress
-    if (percent >= 25) return '#f97316'; // Dark orange for low-medium
-    return '#ef4444'; // Red for low progress
+    if (percent >= 100) return '#10b981';
+    if (percent >= 75) return '#10b981';
+    if (percent >= 50) return '#f59e0b';
+    if (percent >= 25) return '#f97316';
+    return '#ef4444';
   }
 
   function getProgressEmoji(percent, showEmojis) {
@@ -38,7 +38,6 @@
 
   function createNumberRollAnimation(element, oldValue, newValue, config) {
     if (!config.numberRollEnabled || !config.animationsEnabled) {
-      // Just update the number directly
       const numberSpan = element.querySelector('.rolling-number');
       if (numberSpan) {
         numberSpan.textContent = `${newValue.toFixed(config.decimalPrecision)}%`;
@@ -46,26 +45,22 @@
       return;
     }
     
-    const duration = 2500; // 2.5 seconds for the roll
+    const duration = 2500;
     const startTime = performance.now();
     const difference = newValue - oldValue;
 
     function updateNumber(currentTime) {
       const elapsed = currentTime - startTime;
       const progress = Math.min(elapsed / duration, 1);
-
-      // Smoother easing for relaxed feel
       const easeOutQuart = 1 - Math.pow(1 - progress, 4);
 
       const currentValue = oldValue + (difference * easeOutQuart);
       const currentStr = currentValue.toFixed(config.decimalPrecision);
       const newStr = newValue.toFixed(config.decimalPrecision);
 
-      // Split into parts
       const [intPart, decimalPart] = currentStr.split('.');
       const [targetInt, targetDecimal] = newStr.split('.');
 
-      // During animation
       if (progress < 1) {
         const formattedInt = intPart.split('').map((digit, index) => {
           const isCorrect = digit === targetInt[index];
@@ -78,12 +73,10 @@
           ">${digit}</span>`;
         }).join('');
 
-        // Decimal part stays small and green during the roll
         const formattedDecimal = decimalPart.split('').map((digit, index) => {
-          const isCorrect = digit === targetDecimal[index];
           return `<span style="
             display: inline-block;
-            color: #10b981; /* Force green during roll */
+            color: #10b981;
             font-weight: bold;
             font-size: 0.85em;
             opacity: 0.9;
@@ -108,14 +101,10 @@
       if (progress < 1) {
         requestAnimationFrame(updateNumber);
       } else {
-        // Animation complete - start the decimal growth phase
         const numberSpan = element.querySelector('.rolling-number');
         if (numberSpan) {
-          // Get the current emoji
           const emojiSpan = element.querySelector('.progress-emoji');
           const currentEmoji = emojiSpan ? emojiSpan.textContent : getProgressEmoji(newValue, config.showEmojis);
-
-          // Show the final number with decimal small and GREEN
           const [finalInt, finalDecimal] = newStr.split('.');
 
           numberSpan.innerHTML = `
@@ -129,22 +118,18 @@
             </span>
           `;
 
-          // After 2 seconds, animate the decimal back to normal
           setTimeout(() => {
             if (element.isConnected) {
               const decimalSpan = element.querySelector('.decimal-waiting');
               if (decimalSpan) {
-                // Add growth animation
                 decimalSpan.style.transition = 'all 1s ease';
                 decimalSpan.style.fontSize = '1em';
                 decimalSpan.style.color = 'inherit';
                 decimalSpan.style.fontWeight = 'normal';
                 decimalSpan.style.opacity = '0.8';
 
-                // Clean up after animation
                 setTimeout(() => {
                   if (element.isConnected) {
-                    // Restore to normal completely
                     const parentSpan = numberSpan.closest('span[style*="display: flex"]');
                     if (parentSpan) {
                       parentSpan.innerHTML = `
@@ -155,10 +140,10 @@
                       `;
                     }
                   }
-                }, 1000); // Wait for growth animation to finish
+                }, 1000);
               }
             }
-          }, 2000); // Wait 2 seconds before starting growth
+          }, 2000);
         }
       }
     }
@@ -168,7 +153,6 @@
 
   function createDuckDance(element, config, duckFrames) {
     if (!config.duckDanceEnabled || !config.animationsEnabled) {
-      // Just show a simple 100% indicator
       element.innerHTML = `
         <span style="
           display: flex;
@@ -184,7 +168,6 @@
     }
     
     let frame = 0;
-
     const danceInterval = setInterval(() => {
       if (!element.isConnected) {
         clearInterval(danceInterval);
@@ -203,7 +186,6 @@
           ${duckFrames[frame % duckFrames.length]}
         </span>
       `;
-
       frame++;
     }, 300);
 
@@ -225,7 +207,6 @@
     }, 5000);
   }
 
-  // Debounce function with configurable speed
   function debounce(func, wait) {
     let timeout;
     return function executedFunction(...args) {
@@ -238,7 +219,6 @@
     };
   }
 
-  // Get debounce time based on user config
   function getDebounceTime(config) {
     switch(config.updateSpeed) {
       case 'slow': return 300;
@@ -248,9 +228,20 @@
     }
   }
 
+  // Make functions available globally
+  window.ProgressDisplay = {
+    previousPercentages: previousPercentages,
+    getProgressColor: getProgressColor,
+    getProgressEmoji: getProgressEmoji,
+    createNumberRollAnimation: createNumberRollAnimation,
+    createDuckDance: createDuckDance,
+    debounce: debounce,
+    getDebounceTime: getDebounceTime
+  };
+
   // Main progress update function
   window.initProgressDisplay = function(userConfig, duckFrames) {
-    console.log('📊 Progress display initialized');
+    console.log('📊 Progress display initialized with config:', userConfig);
 
     // Add progress-specific styles
     const style = document.createElement('style');
@@ -291,7 +282,6 @@
         color: inherit;
       }
 
-      /* Normal state */
       .fc-percent .rolling-number {
         color: inherit;
         font-family: monospace;
@@ -299,21 +289,23 @@
         align-items: baseline;
       }
 
-      /* Decimal part normal state */
       .fc-percent .rolling-number span[style*="font-size: 0.85em"] {
         font-size: 0.85em !important;
         opacity: 0.8 !important;
         color: inherit !important;
       }
 
-      /* Green decimal during hold phase */
       .decimal-waiting {
         color: #10b981 !important;
         font-weight: bold !important;
         transition: all 1s ease;
       }
     `;
-    document.head.appendChild(style);
+    
+    if (!document.getElementById('progress-styles')) {
+      style.id = 'progress-styles';
+      document.head.appendChild(style);
+    }
 
     const updatePercents = debounce(function() {
       document.querySelectorAll('[role="progressbar"][aria-valuenow]').forEach(bar => {
@@ -323,9 +315,8 @@
         const percentValue = raw;
         const pct = percentValue.toFixed(userConfig.decimalPrecision);
 
-        const row =
-          bar.closest('div[class*="onboarding-offer-task"]') ||
-          bar.closest('div[class*="rounded"]');
+        const row = bar.closest('div[class*="onboarding-offer-task"]') ||
+                    bar.closest('div[class*="rounded"]');
 
         if (!row) return;
 
@@ -358,7 +349,6 @@
         const progressColor = getProgressColor(percentValue);
         const progressEmoji = getProgressEmoji(percentValue, userConfig.showEmojis);
 
-        // Special handling for 100%
         if (percentValue >= 100) {
           if (!pctEl.classList.contains('duck-dancing')) {
             pctEl.classList.add('duck-dancing');
@@ -391,7 +381,6 @@
 
         pctEl.classList.remove('duck-dancing');
 
-        // Style with colored border and transparent background
         let borderAnimation = '';
         if (userConfig.borderPulseEnabled && userConfig.animationsEnabled) {
           borderAnimation = 'animation: borderPulse 2s infinite;';
@@ -412,7 +401,6 @@
           ${borderAnimation}
         `;
 
-        // Create the inner content structure (normal, non-animated state)
         const normalContent = `
           <span style="
             display: flex;
@@ -432,11 +420,9 @@
           </span>
         `;
 
-        // Only set content if it's a new element or if we're not animating
         if (isNewElement) {
           pctEl.innerHTML = normalContent;
         } else {
-          // Update emoji if needed
           const emojiSpan = pctEl.querySelector('.progress-emoji');
           if (userConfig.showEmojis) {
             if (emojiSpan && emojiSpan.textContent !== progressEmoji) {
@@ -448,27 +434,23 @@
                 }, 500);
               }
             } else if (!emojiSpan && progressEmoji) {
-              // Add emoji if missing
               const container = pctEl.querySelector('span[style*="display: flex"]');
               if (container) {
-                const emojiSpan = document.createElement('span');
-                emojiSpan.className = 'progress-emoji';
-                emojiSpan.style.fontSize = '1.1em';
-                emojiSpan.textContent = progressEmoji;
-                container.insertBefore(emojiSpan, container.firstChild);
+                const newEmojiSpan = document.createElement('span');
+                newEmojiSpan.className = 'progress-emoji';
+                newEmojiSpan.style.fontSize = '1.1em';
+                newEmojiSpan.textContent = progressEmoji;
+                container.insertBefore(newEmojiSpan, container.firstChild);
               }
             }
           } else if (emojiSpan) {
-            // Remove emoji if disabled
             emojiSpan.remove();
           }
         }
 
-        // Animate number roll if it's a real change
         if (isRealChange && !isNewElement) {
           createNumberRollAnimation(pctEl, oldPercent, percentValue, userConfig);
 
-          // Add container pop animation
           if (userConfig.animationsEnabled) {
             pctEl.style.animation = 'containerPop 0.8s ease';
             setTimeout(() => {
@@ -482,27 +464,20 @@
     }, getDebounceTime(userConfig));
 
     // Initial runs
-    setTimeout(() => {
-      updatePercents();
-    }, 500);
-    
-    setTimeout(() => updatePercents(), 1500);
-    setTimeout(() => updatePercents(), 3000);
+    setTimeout(updatePercents, 500);
+    setTimeout(updatePercents, 1500);
+    setTimeout(updatePercents, 3000);
 
     // Observer for dynamic content
-    const observer = new MutationObserver(() => {
-      updatePercents();
-    });
-
+    const observer = new MutationObserver(updatePercents);
     observer.observe(document.body, {
       childList: true,
       subtree: true
     });
 
-    // Attribute observer for progress values
     const attributeObserver = new MutationObserver((mutations) => {
       for (const mutation of mutations) {
-        if (mutation.target.hasAttribute && mutation.target.hasAttribute('role') &&
+        if (mutation.target.hasAttribute('role') &&
             mutation.target.getAttribute('role') === 'progressbar' &&
             mutation.attributeName === 'aria-valuenow') {
           updatePercents();
@@ -520,4 +495,5 @@
     return updatePercents;
   };
 
+  console.log('📊 Progress display module loaded');
 })();
