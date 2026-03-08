@@ -1,8 +1,8 @@
 // ==UserScript==
-// @name         Freecash Easter Egg
+// @name         Freecash Easter Egg Gem
 // @namespace    freecash-easter-egg
-// @version      1.0.0
-// @description  Shows a heart with a duck and a goat facing each other when Konami code is entered
+// @version      1.1.0
+// @description  Shows a gem with a duck (mirrored) and a goat facing each other when Konami code is entered
 // @author       DuckyQuack
 // @match        https://freecash.com/*
 // @match        https://www.freecash.com/*
@@ -13,7 +13,7 @@
 (function() {
   'use strict';
 
-  const konamiCode = ['ArrowUp','ArrowDown','ArrowUp','ArrowDown','ArrowLeft','ArrowRight','ArrowLeft','ArrowRight','b','a','Enter'];
+  const konamiCode = ['ArrowUp','ArrowUp','ArrowDown','ArrowDown','ArrowLeft','ArrowRight','ArrowLeft','ArrowRight','b','a','Enter'];
   let codeIndex = 0;
 
   GM_addStyle(`
@@ -32,32 +32,21 @@
       transition: opacity 0.5s ease !important;
     }
 
-    #easteregg-overlay.show {
-      opacity: 1 !important;
-    }
+    #easteregg-overlay.show { opacity: 1 !important; }
 
-    #heart-container {
+    #gem-container {
       position: relative !important;
       width: 400px !important;
       height: 400px !important;
     }
 
-    #heart {
+    #gem {
       position: absolute !important;
       width: 100% !important;
       height: 100% !important;
       background: linear-gradient(135deg, #ff5f6d, #ffc371) !important;
       clip-path: polygon(
-        50% 0%,
-        61% 10%,
-        70% 25%,
-        70% 40%,
-        60% 55%,
-        50% 70%,
-        40% 55%,
-        30% 40%,
-        30% 25%,
-        39% 10%
+        50% 0%, 65% 15%, 80% 40%, 70% 70%, 50% 100%, 30% 70%, 20% 40%, 35% 15%
       ) !important;
       display: flex !important;
       align-items: center !important;
@@ -66,7 +55,7 @@
       color: white !important;
     }
 
-    #heart-content {
+    #gem-content {
       position: absolute !important;
       display: flex !important;
       align-items: center !important;
@@ -75,14 +64,14 @@
       gap: 40px !important;
     }
 
-    #heart-content span {
+    #gem-content span {
       display: inline-block !important;
       transform: translateY(0);
       animation: bounce 1.5s infinite alternate ease-in-out;
     }
 
-    #heart-content span:nth-child(1) { animation-delay: 0s; }
-    #heart-content span:nth-child(2) { animation-delay: 0.3s; }
+    #gem-content span:nth-child(1) { animation-delay: 0s; transform: scaleX(-1); } /* Mirrored duck */
+    #gem-content span:nth-child(2) { animation-delay: 0.3s; }
 
     @keyframes bounce {
       0% { transform: translateY(0) rotate(0deg); }
@@ -97,31 +86,30 @@
     const overlay = document.createElement('div');
     overlay.id = 'easteregg-overlay';
 
-    const heartContainer = document.createElement('div');
-    heartContainer.id = 'heart-container';
+    const gemContainer = document.createElement('div');
+    gemContainer.id = 'gem-container';
 
-    const heart = document.createElement('div');
-    heart.id = 'heart';
+    const gem = document.createElement('div');
+    gem.id = 'gem';
 
-    const heartContent = document.createElement('div');
-    heartContent.id = 'heart-content';
+    const gemContent = document.createElement('div');
+    gemContent.id = 'gem-content';
 
     const duck = document.createElement('span');
-    duck.textContent = '🦆';
+    duck.textContent = '🦆'; // mirrored via scaleX(-1)
 
     const goat = document.createElement('span');
     goat.textContent = '🐐';
 
-    heartContent.appendChild(duck);
-    heartContent.appendChild(goat);
-    heartContainer.appendChild(heart);
-    heartContainer.appendChild(heartContent);
-    overlay.appendChild(heartContainer);
+    gemContent.appendChild(duck);
+    gemContent.appendChild(goat);
+    gemContainer.appendChild(gem);
+    gemContainer.appendChild(gemContent);
+    overlay.appendChild(gemContainer);
     document.body.appendChild(overlay);
 
     requestAnimationFrame(() => overlay.classList.add('show'));
 
-    // Close on click
     overlay.addEventListener('click', () => {
       overlay.classList.remove('show');
       setTimeout(() => overlay.remove(), 500);
