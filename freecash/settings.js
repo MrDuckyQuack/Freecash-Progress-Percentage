@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Freecash Progress Settings UI
 // @namespace    freecash-settings-ui
-// @version      1.9
+// @version      1.5.4
 // @description  Settings UI for Freecash Progress Script with auto-save
 // @author       DuckyQuack
 // @match        https://freecash.com/*
@@ -565,23 +565,23 @@
       }
 
       /* Fix for settings button not being blurred */
+/* Fix for settings button - KEEP IT VISIBLE AND CRISP */
 .fc-settings-btn,
-button.fc-settings-btn,
-[class*="settings"] button,
-button:has(> span:contains("⚙️")),
-.fc-settings-button {
+button.fc-settings-btn {
   /* Override any backdrop-filter from parent elements */
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
   filter: none !important;
   -webkit-filter: none !important;
   
-  /* Ensure it stays above the blur */
+  /* Ensure it stays visible */
+  display: inline-block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  
+  /* Keep it above the blur */
   position: relative !important;
   z-index: 1000000 !important;
-  
-  /* Prevent any transparency issues */
-  background: inherit !important;
   
   /* Force hardware acceleration */
   transform: translateZ(0) !important;
@@ -590,31 +590,20 @@ button:has(> span:contains("⚙️")),
   /* Maintain crisp rendering */
   image-rendering: crisp-edges !important;
   -webkit-font-smoothing: antialiased !important;
-  
-  /* Isolate from parent effects */
-  isolation: isolate !important;
 }
 
+/* When modal is open */
 body.fc-modal-open .fc-settings-btn,
-body.fc-modal-open button.fc-settings-btn,
-body.fc-modal-open [class*="settings"] button,
-body.fc-modal-open .fc-settings-button {
+body.fc-modal-open button.fc-settings-btn {
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
   filter: none !important;
   -webkit-filter: none !important;
+  display: inline-block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
   z-index: 1000000 !important;
-  position: relative !important;
 }
-
-/* Ensure the button's container doesn't interfere */
-body.fc-modal-open div:has(> .fc-settings-btn),
-body.fc-modal-open section:has(> .fc-settings-btn) {
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
-  filter: none !important;
-}
-
     `);
 
     // Create modal elements
