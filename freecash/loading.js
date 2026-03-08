@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Freecash Duck Welcome
 // @namespace    freecash-duck-welcome
-// @version      1.6.0
+// @version      1.7.0
 // @description  Shows a cute duck loading screen on Freecash with animated floating ducks and balloons
 // @author       DuckyQuack
 // @match        https://freecash.com/*
@@ -164,7 +164,35 @@
   let isShowing = false;
   let hasShownInitial = false;
 
+  // Function to check if duck welcome is enabled
+  function isDuckWelcomeEnabled() {
+    // Check window.userConfig first
+    if (window.userConfig && window.userConfig.showDuckWelcome !== undefined) {
+      return window.userConfig.showDuckWelcome === true;
+    }
+    
+    // Check localStorage directly as fallback
+    try {
+      const saved = localStorage.getItem('fc-ducky-config');
+      if (saved) {
+        const config = JSON.parse(saved);
+        return config.showDuckWelcome !== false; // Default to true if not set
+      }
+    } catch (e) {
+      console.log('Error reading config:', e);
+    }
+    
+    // Default to enabled
+    return true;
+  }
+
   function showDuck() {
+    // Check if duck welcome is enabled
+    if (!isDuckWelcomeEnabled()) {
+      console.log('🦆 Duck welcome screen is disabled');
+      return;
+    }
+    
     if (isShowing) return;
     if (activeTimer) clearTimeout(activeTimer);
 
@@ -233,10 +261,31 @@
 
   function triggerAfterDelay() {
     if (isShowing) return;
+    // Check if enabled before triggering
+    if (!isDuckWelcomeEnabled()) {
+      console.log('🦆 Duck welcome screen is disabled, not showing');
+      return;
+    }
     setTimeout(showDuck, 50);
   }
 
-  if (!hasShownInitial) {
+  // Listen for config changes
+  window.addEventListener('duckConfigChanged', (e) => {
+    console.log('🦆 Config changed in loading.js:', e.detail);
+    // If disabled and currently showing, hide it
+    if (e.detail.showDuckWelcome === false && isShowing) {
+      const el = document.getElementById('duck-welcome-screen');
+      if (el) {
+        el.classList.add('duck-hiding');
+        setTimeout(() => { el.remove(); isShowing = false; }, 500);
+      }
+    }
+  });
+
+  // Check config immediately
+  if (!isDuckWelcomeEnabled()) {
+    console.log('🦆 Duck welcome screen is disabled on startup');
+  } else if (!hasShownInitial) {
     if (document.readyState === 'complete') {
       hasShownInitial = true;
       triggerAfterDelay();
@@ -253,8 +302,35 @@
   const _pushState = history.pushState.bind(history);
   const _replaceState = history.replaceState.bind(history);
 
-  history.pushState = function (...args) { _pushState(...args); if (hasShownInitial) triggerAfterDelay(); };
-  history.replaceState = function (...args) { _replaceState(...args); if (hasShownInitial) triggerAfterDelay(); };
-  window.addEventListener('popstate', () => { if (hasShownInitial) triggerAfterDelay(); });
+  history.pushState = function (...args) { 
+    _pushState(...args); 
+    if (hasShownInitial && isDuckWelcomeEnabled()) triggerAfterDelay(); 
+  };
+  
+  history.replaceState = function (...args) { 
+    _replaceState(...args); 
+    if (hasShownInitial && isDuckWelcomeEnabled()) triggerAfterDelay(); 
+  };
+  
+  window.addEventListener('popstate', () => { 
+    if (hasShownInitial && isDuckWelcomeEnabled()) triggerAfterDelay(); 
+  });
+
+  // Also check config periodically for the first few seconds
+  // (in case settings.js loads after loading.js)
+  let checkCount = 0;
+  const configCheck = setInterval(() => {
+    checkCount++;
+    if (isDuckWelcomeEnabled()) {
+      // If enabled and we haven't shown yet, show it
+      if (!hasShownInitial && !isShowing) {
+        hasShownInitial = true;
+        showDuck();
+      }
+      clearInterval(configCheck);
+    } else if (checkCount > 20) { // Stop after 2 seconds (20 * 100ms)
+      clearInterval(configCheck);
+    }
+  }, 100);
 
 })();
