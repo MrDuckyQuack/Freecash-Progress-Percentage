@@ -1,17 +1,65 @@
 // ==UserScript==
 // @name         Freecash Progress Percentage with Colored Borders - Made by DuckyQuack
 // @namespace    freecash-percent-4dec
-// @version      2.9
+// @version      3.0
 // @description  Show progress percentage with colored container borders and duck dance at 100% - Customized by DuckyQuack
 // @author       DuckyQuack
 // @match        https://freecash.com/*
 // @match        https://www.freecash.com/*
 // @run-at       document-idle
-// @grant        none
+// @grant        GM_addStyle
 // ==/UserScript==
 
 (function () {
   'use strict';
+
+  // ========== LOADER INDICATOR ==========
+  console.log('🦆 Freecash Progress Script starting...');
+
+  // Add loader styles
+  GM_addStyle(`
+    .fc-loader-script {
+      position: fixed;
+      bottom: 10px;
+      right: 10px;
+      background: rgba(0,0,0,0.9);
+      color: #10b981;
+      padding: 8px 16px;
+      border-radius: 30px;
+      font-size: 13px;
+      z-index: 99999;
+      font-family: monospace;
+      border: 2px solid #10b981;
+      box-shadow: 0 0 15px rgba(16,185,129,0.3);
+      backdrop-filter: blur(4px);
+      animation: slideIn 0.3s ease;
+    }
+    @keyframes slideIn {
+      from { transform: translateX(100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+  `);
+
+  const loader = document.createElement('div');
+  loader.className = 'fc-loader-script';
+  loader.innerHTML = '🦆 Loading Script...';
+  document.body.appendChild(loader);
+
+  // Function to update loader
+  function updateLoader(message, isSuccess = true) {
+    if (loader && loader.parentNode) {
+      loader.innerHTML = message;
+      if (!isSuccess) {
+        loader.style.borderColor = '#ef4444';
+        loader.style.color = '#ef4444';
+      }
+      setTimeout(() => {
+        loader.style.transition = 'opacity 0.5s';
+        loader.style.opacity = '0';
+        setTimeout(() => loader.remove(), 500);
+      }, 2000);
+    }
+  }
 
   // Store previous percentages to detect REAL changes
   const previousPercentages = new Map();
@@ -414,7 +462,11 @@
   document.head.appendChild(style);
 
   // Initial runs
-  setTimeout(() => updatePercents(), 500);
+  setTimeout(() => {
+    updatePercents();
+    updateLoader('✅ Script Loaded! 🎉');
+  }, 500);
+  
   setTimeout(() => updatePercents(), 1500);
   setTimeout(() => updatePercents(), 3000);
 
@@ -446,4 +498,3 @@
     attributeFilter: ['aria-valuenow']
   });
 })();
-
