@@ -567,7 +567,7 @@
       /* Settings Button Styles */
       .fc-settings-btn {
         position: fixed !important;
-        bottom: 20px !important;
+        bottom: 80px !important;
         right: 20px !important;
         width: 50px !important;
         height: 50px !important;
