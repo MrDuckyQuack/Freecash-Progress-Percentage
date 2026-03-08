@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Freecash Duck Welcome
 // @namespace    freecash-duck-welcome
-// @version      1.1
+// @version      1.2
 // @description  Shows a cute duck loading screen for 4 seconds on Freecash
 // @author       DuckyQuack
 // @match        https://freecash.com/*
@@ -37,13 +37,14 @@
       box-sizing: border-box !important;
       font-family: 'Segoe UI', system-ui, -apple-system, sans-serif !important;
       animation: duckFadeOut 0.5s ease 4s forwards !important;
-      pointer-events: none !important;
+      pointer-events: all !important;
     }
 
     @keyframes duckFadeOut {
       to {
         opacity: 0;
         visibility: hidden;
+        pointer-events: none;
       }
     }
 
@@ -126,12 +127,6 @@
       font-weight: 300 !important;
       letter-spacing: 1px !important;
     }
-
-    /* Force hide everything else while loading */
-    .duck-welcome-container ~ * {
-      opacity: 0 !important;
-      pointer-events: none !important;
-    }
   `);
 
   // Array of fun duck messages
@@ -151,36 +146,21 @@
   // Array of duck emojis
   const duckEmojis = ["🦆", "🦆✨", "🦆🌟", "🦆💫", "🦆⚡", "🦆🌈", "🦆🔥", "🦆💦", "🐥", "🦆🦆"];
 
-  // Show welcome screen immediately
+  let welcomeShown = false;
+
   function showWelcomeScreen() {
-    // Check if already shown in this session
-    if (sessionStorage.getItem('duckWelcomeShown')) {
-      return;
-    }
+    // Prevent duplicate overlays within the same page load
+    if (welcomeShown || document.getElementById('duck-welcome-screen')) return;
+    welcomeShown = true;
 
     console.log('🦆 Showing welcome screen...');
 
-    // Random selections
     const randomMessage = duckMessages[Math.floor(Math.random() * duckMessages.length)];
     const randomDuck = duckEmojis[Math.floor(Math.random() * duckEmojis.length)];
 
-    // Create welcome screen
     const welcomeScreen = document.createElement('div');
     welcomeScreen.className = 'duck-welcome-container';
     welcomeScreen.id = 'duck-welcome-screen';
-    welcomeScreen.style.cssText = `
-      position: fixed !important;
-      top: 0 !important;
-      left: 0 !important;
-      width: 100% !important;
-      height: 100% !important;
-      background: linear-gradient(135deg, #0f172a, #1e293b) !important;
-      z-index: 999999999 !important;
-      display: flex !important;
-      flex-direction: column !important;
-      align-items: center !important;
-      justify-content: center !important;
-    `;
 
     welcomeScreen.innerHTML = `
       <div class="duck-welcome-duck">${randomDuck}</div>
@@ -192,17 +172,10 @@
       <div class="duck-welcome-footer">🐤 Created by DuckyQuack</div>
     `;
 
-    // Force add to document
-    if (document.documentElement) {
-      document.documentElement.appendChild(welcomeScreen);
-    } else {
-      document.appendChild(welcomeScreen);
-    }
+    const target = document.body || document.documentElement;
+    target.appendChild(welcomeScreen);
 
-    // Mark as shown
-    sessionStorage.setItem('duckWelcomeShown', 'true');
-    
-    // Remove after 4.5 seconds
+    // Remove after animation completes (4s fade + 0.5s transition)
     setTimeout(() => {
       const screen = document.getElementById('duck-welcome-screen');
       if (screen && screen.parentNode) {
@@ -212,25 +185,20 @@
     }, 4500);
   }
 
-  // Try to show immediately
-  if (document.documentElement) {
+  // Show as early as possible
+  if (document.body || document.documentElement) {
     showWelcomeScreen();
-  } else {
-    // Wait for document to be ready
-    document.addEventListener('readystatechange', () => {
-      if (document.readyState === 'interactive' || document.readyState === 'complete') {
-        showWelcomeScreen();
-      }
-    });
   }
 
-  // Force show on DOMContentLoaded
   document.addEventListener('DOMContentLoaded', showWelcomeScreen);
-
-  // Also try on load
   window.addEventListener('load', showWelcomeScreen);
 
-  // Manual override
-  window.showDuckWelcome = showWelcomeScreen;
+  // Manual override (resets the guard so it can be triggered again)
+  window.showDuckWelcome = () => {
+    welcomeShown = false;
+    const existing = document.getElementById('duck-welcome-screen');
+    if (existing) existing.parentNode.removeChild(existing);
+    showWelcomeScreen();
+  };
 
 })();
