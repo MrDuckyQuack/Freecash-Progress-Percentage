@@ -52,11 +52,6 @@ Add this loader script to your Tampermonkey. It will automatically fetch the lat
 // @grant        GM_addStyle
 // @require      https://raw.githubusercontent.com/MrDuckyQuack/Freecash-Progress-Percentage/refs/heads/main/freecash-script
 // ==/UserScript==
-
-(function() {
-    'use strict';
-    console.log('🦆 Freecash Progress Loader: Loading main script from GitHub...');
-})();
 ```
 
 This version will automatically update whenever I push improvements! 🚀
