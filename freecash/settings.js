@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Freecash Progress Settings UI
 // @namespace    freecash-settings-ui
-// @version      1.6.4
+// @version      1.6.5
 // @description  Settings UI for Freecash Progress Script with auto-save
 // @author       DuckyQuack
 // @match        https://freecash.com/*
@@ -147,7 +147,7 @@
         -webkit-overflow-scrolling: touch;
       }
 
-      /* Main Tab Styles - NOW MATCHES PERFORMANCE TAB */
+      /* Main Tab Styles */
       .fc-main-section {
         padding: 5px 0;
       }
@@ -169,6 +169,64 @@
         gap: 8px;
         border-bottom: 1px solid rgba(16,185,129,0.3);
         padding-bottom: 8px;
+      }
+
+      /* Themes Tab - Coming Soon */
+      .fc-themes-section {
+        padding: 5px 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 250px;
+      }
+
+      .fc-coming-soon-container {
+        background: rgba(255,255,255,0.05);
+        border-radius: 16px;
+        padding: 30px 20px;
+        text-align: center;
+        border: 2px dashed rgba(16,185,129,0.3);
+        width: 100%;
+      }
+
+      .fc-coming-soon-icon {
+        font-size: 64px;
+        margin-bottom: 15px;
+        animation: floatIcon 3s ease-in-out infinite;
+        opacity: 0.8;
+      }
+
+      @keyframes floatIcon {
+        0%, 100% { transform: translateY(0) rotate(0deg); }
+        50% { transform: translateY(-15px) rotate(5deg); }
+      }
+
+      .fc-coming-soon-title {
+        font-size: 28px;
+        font-weight: bold;
+        color: #10b981;
+        margin-bottom: 10px;
+        text-shadow: 0 0 20px rgba(16,185,129,0.3);
+      }
+
+      .fc-coming-soon-text {
+        color: #9ca3af;
+        font-size: 16px;
+        margin-bottom: 20px;
+      }
+
+      .fc-coming-soon-duck {
+        font-size: 48px;
+        animation: duckWaddle 2s ease-in-out infinite;
+        margin-top: 10px;
+        opacity: 0.6;
+      }
+
+      @keyframes duckWaddle {
+        0%, 100% { transform: translateX(0) rotate(0deg); }
+        25% { transform: translateX(-10px) rotate(-5deg); }
+        75% { transform: translateX(10px) rotate(5deg); }
       }
 
       /* Support Tab Styles */
@@ -550,7 +608,7 @@
         to { opacity: 1; }
       }
 
-      /* Settings Button Styles - White gear, no border */
+      /* Settings Button Styles - FIXED: White gear, no border */
       .fc-settings-btn {
         position: fixed !important;
         bottom: 80px !important;
@@ -562,12 +620,6 @@
         border: none !important;
         outline: none !important;
         box-shadow: 0 4px 15px rgba(16,185,129,0.4) !important;
-        color: white !important;
-        font-size: 28px !important;
-        cursor: pointer !important;
-        display: flex !important;
-        align-items: center !important;
-        justify-content: center !important;
         z-index: 999997 !important;
         transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease !important;
         animation: settingsButtonAppear 0.3s ease !important;
@@ -578,16 +630,29 @@
         -webkit-appearance: none !important;
         -moz-appearance: none !important;
         appearance: none !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        cursor: pointer !important;
+        color: white !important;
       }
 
-      .fc-settings-btn .gear-icon {
+      /* The gear icon - FORCED WHITE with multiple overrides */
+      .fc-settings-btn .gear-icon,
+      .fc-settings-btn span,
+      .fc-settings-btn::before,
+      .fc-settings-btn::after {
         color: white !important;
-        display: inline-block !important;
+        fill: white !important;
+        stroke: white !important;
         filter: none !important;
         -webkit-filter: none !important;
-        opacity: 1 !important;
         text-shadow: none !important;
-        font-weight: normal !important;
+        background: none !important;
+        opacity: 1 !important;
+        font-size: 28px !important;
+        display: inline-block !important;
+        line-height: 1 !important;
       }
 
       .fc-settings-btn:hover {
@@ -629,13 +694,20 @@
       }
     `);
 
-    // Create settings button with white gear
+    // Create settings button with white gear - FIXED with explicit styling
     const settingsBtn = document.createElement('button');
     settingsBtn.className = 'fc-settings-btn';
     settingsBtn.id = 'fc-settings-btn';
-    settingsBtn.innerHTML = '<span class="gear-icon">⚙️</span>';
     settingsBtn.setAttribute('aria-label', 'Open Settings');
-    settingsBtn.setAttribute('title', 'DuckyQuack Settings');
+    settingsBtn.setAttribute('title', 'Duckcash Settings');
+    
+    // Create gear span with explicit style to ensure white color
+    const gearSpan = document.createElement('span');
+    gearSpan.className = 'gear-icon';
+    gearSpan.textContent = '⚙️';
+    gearSpan.style.cssText = 'color: white !important; filter: none !important; -webkit-filter: none !important;';
+    settingsBtn.appendChild(gearSpan);
+    
     document.body.appendChild(settingsBtn);
 
     // Create modal elements
@@ -674,10 +746,10 @@
       showEmojis: true,
       decimalPrecision: 4,
       updateSpeed: 'normal',
-      showDuckWelcome: true
+      showDuckLoading: true
     };
 
-    // Build modal with tabs - Main tab now matches Performance tab exactly
+    // Build modal with tabs - Added Themes tab
     modal.innerHTML = `
       <div class="fc-settings-modal-header">
         <h3><span>🦆</span> DuckyQuack Settings</h3>
@@ -687,21 +759,22 @@
       <div class="fc-settings-tabs">
         <button class="fc-settings-tab active" data-tab="main"><span>🏠</span> Main</button>
         <button class="fc-settings-tab" data-tab="performance"><span>⚡</span> Performance</button>
+        <button class="fc-settings-tab" data-tab="themes"><span>🎨</span> Themes</button>
         <button class="fc-settings-tab" data-tab="support"><span>❓</span> Support</button>
       </div>
       
-      <!-- Main Tab Content - NOW MATCHES PERFORMANCE TAB EXACTLY -->
+      <!-- Main Tab Content -->
       <div class="fc-settings-tab-content" id="fc-tab-main">
         <div class="fc-main-section">
           <div class="fc-setting-group">
-            <h4><span>🦆</span> Welcome Screen</h4>
+            <h4><span>🦆</span> Loading Screen</h4>
             
             <div class="fc-setting-item">
               <span class="fc-setting-label">
-                <span>🎬</span> Show Duck Welcome Screen
+                <span>🎬</span> Show Duck Loading Screen
               </span>
               <label class="fc-toggle">
-                <input type="checkbox" id="fc-toggle-duck-welcome" ${currentConfig.showDuckWelcome !== false ? 'checked' : ''}>
+                <input type="checkbox" id="fc-toggle-duck-loading" ${currentConfig.showDuckLoading !== false ? 'checked' : ''}>
                 <span class="fc-toggle-slider"></span>
               </label>
             </div>
@@ -796,6 +869,25 @@
         </div>
       </div>
       
+      <!-- Themes Tab Content - Coming Soon -->
+      <div class="fc-settings-tab-content" id="fc-tab-themes" style="display: none;">
+        <div class="fc-themes-section">
+          <div class="fc-coming-soon-container">
+            <div class="fc-coming-soon-icon">🎨✨</div>
+            <div class="fc-coming-soon-title">Coming Soon!</div>
+            <div class="fc-coming-soon-text">Themes and color customization are on their way</div>
+            <div class="fc-coming-soon-duck">🦆🖌️</div>
+            <div style="color: #6b7280; font-size: 13px; margin-top: 20px;">
+              Future updates will include:<br>
+              • Custom color schemes<br>
+              • Dark/Light mode toggle<br>
+              • Progress bar styles<br>
+              • And more!
+            </div>
+          </div>
+        </div>
+      </div>
+      
       <!-- Support Tab Content -->
       <div class="fc-settings-tab-content" id="fc-tab-support" style="display: none;">
         <div class="fc-support-section">
@@ -858,8 +950,8 @@
       // Batch DOM updates
       requestAnimationFrame(() => {
         // Main tab toggles
-        const duckWelcomeToggle = getCachedElement('fc-toggle-duck-welcome');
-        if (duckWelcomeToggle) duckWelcomeToggle.checked = latestConfig.showDuckWelcome !== false;
+        const duckLoadingToggle = getCachedElement('fc-toggle-duck-loading');
+        if (duckLoadingToggle) duckLoadingToggle.checked = latestConfig.showDuckLoading !== false;
         
         // Performance tab toggles
         const animationsToggle = getCachedElement('fc-toggle-animations');
@@ -911,6 +1003,7 @@
     const tabs = modal.querySelectorAll('.fc-settings-tab');
     const mainTab = document.getElementById('fc-tab-main');
     const perfTab = document.getElementById('fc-tab-performance');
+    const themesTab = document.getElementById('fc-tab-themes');
     const supportTab = document.getElementById('fc-tab-support');
 
     tabs.forEach(tab => {
@@ -922,6 +1015,7 @@
         requestAnimationFrame(() => {
           mainTab.style.display = 'none';
           perfTab.style.display = 'none';
+          themesTab.style.display = 'none';
           supportTab.style.display = 'none';
           
           const tabName = tab.dataset.tab;
@@ -934,6 +1028,8 @@
               loadSettingsIntoUI();
               updatePrecisionDisplay();
             });
+          } else if (tabName === 'themes') {
+            themesTab.style.display = 'block';
           } else if (tabName === 'support') {
             supportTab.style.display = 'block';
             initFaqAccordion();
@@ -961,16 +1057,16 @@
     const saveMainBtn = document.getElementById('fc-save-main-settings');
     if (saveMainBtn) {
       saveMainBtn.addEventListener('click', () => {
-        // Get the duck welcome setting
-        const showDuckWelcome = getCachedElement('fc-toggle-duck-welcome')?.checked ?? true;
+        // Get the duck loading setting
+        const showDuckLoading = getCachedElement('fc-toggle-duck-loading')?.checked ?? true;
         
         // Create config object with just this setting (preserve others)
         const newConfig = {
           ...window.userConfig, // Keep existing settings
-          showDuckWelcome: showDuckWelcome
+          showDuckLoading: showDuckLoading
         };
         
-        console.log('💾 Saving main settings:', { showDuckWelcome });
+        console.log('💾 Saving main settings:', { showDuckLoading });
         
         // Save to localStorage
         try {
@@ -1013,7 +1109,7 @@
         // Gather all settings
         const newConfig = {
           // Main tab settings
-          showDuckWelcome: getCachedElement('fc-toggle-duck-welcome')?.checked ?? true,
+          showDuckLoading: getCachedElement('fc-toggle-duck-loading')?.checked ?? true,
           
           // Performance tab settings
           animationsEnabled: getCachedElement('fc-toggle-animations')?.checked ?? true,
@@ -1135,7 +1231,7 @@
     // Initial load of settings
     loadSettingsIntoUI();
 
-    console.log('⚙️ Settings UI initialized - Main tab now matches Performance tab exactly');
+    console.log('⚙️ Settings UI initialized with white gear (FIXED), Main tab matches Performance, and new Themes tab');
   }
 
   // Start waiting for main script
