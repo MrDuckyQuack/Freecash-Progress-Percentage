@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Freecash Progress Settings UI
 // @namespace    freecash-settings-ui
-// @version      1.6.7
+// @version      1.6.8
 // @description  Settings UI for Freecash Progress Script with auto-save
 // @author       DuckyQuack
 // @match        https://freecash.com/*
@@ -788,7 +788,7 @@
     // Build modal with tabs - Added scrollable tab container
     modal.innerHTML = `
       <div class="fc-settings-modal-header">
-        <h3><span>🦆</span> DuckyQuack Settings</h3>
+        <h3><span>🦆</span> Duckcash Settings</h3>
         <button class="fc-settings-modal-close" id="fc-settings-modal-close">✕</button>
       </div>
       
@@ -949,7 +949,7 @@
         </div>
       </div>
       
-      <div class="fc-settings-modal-footer">Made with 🦆 by DuckyQuack | v3.5</div>
+      <div class="fc-settings-modal-footer">Made with 🦆 by DuckyQuack | v3.6</div>
     `;
 
     document.body.appendChild(modalOverlay);
