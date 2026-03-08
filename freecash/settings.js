@@ -563,11 +563,33 @@
       }
 
       /* Fix for settings button not being blurred */
-      .fc-settings-btn {
-        backdrop-filter: none !important;
-        filter: none !important;
-        -webkit-backdrop-filter: none !important;
-      }
+.fc-settings-btn,
+button.fc-settings-btn,
+[class*="settings"],
+button:has(> span:contains("⚙️")),
+button:has(svg),
+.fc-settings-button {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  filter: none !important;
+  -webkit-filter: none !important;
+  transform: translateZ(0) !important;
+  -webkit-transform: translateZ(0) !important;
+  isolation: isolate !important;
+  position: relative !important;
+  z-index: 1000000 !important;
+}
+
+body.fc-modal-open .fc-settings-btn,
+body.fc-modal-open button.fc-settings-btn,
+body.fc-modal-open [class*="settings"] {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  filter: none !important;
+  -webkit-filter: none !important;
+  image-rendering: crisp-edges !important;
+}
+
     `);
 
     // Create modal elements
