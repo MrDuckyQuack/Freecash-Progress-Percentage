@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Freecash Game Warning
 // @namespace    freecash-game-warning
-// @version      1.0.0
+// @version      1.0.1
 // @description  Shows a warning popup when clicking game offer buttons to remind users about VPN/Adblocker
 // @author       DuckyQuack
 // @match        https://freecash.com/*
@@ -214,7 +214,7 @@
         modal.innerHTML = `
             <div class="fc-warning-header">
                 <span class="fc-warning-icon">⚠️</span>
-                <span class="fc-warning-title">ATTENTION DUCK!</span>
+                <span class="fc-warning-title">ATTENTION USER!</span>
             </div>
             <div class="fc-warning-content">
                 🦆 <strong>Please disable your VPN and Adblocker</strong> 🦆
@@ -225,7 +225,7 @@
                 • Adblocker is disabled for this site<br>
                 • Your browser allows tracking
                 <br><br>
-                <span style="color: #fbbf24; font-size: 16px;">⏱️ This warning auto-closes in:</span>
+                <span style="color: #fbbf24; font-size: 16px;">⏱️ You can close the warning in:</span>
             </div>
             <div class="fc-warning-timer" id="warning-timer">3</div>
             <div class="fc-warning-buttons">
