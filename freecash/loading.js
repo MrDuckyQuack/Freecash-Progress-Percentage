@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Freecash Duck Loading
 // @namespace    freecash-duck-Loading
-// @version      2.0.3
+// @version      2.0.4
 // @description  Shows a cute duck loading screen on Freecash with animated floating ducks and balloons
 // @author       DuckyQuack
 // @match        https://freecash.com/*
@@ -185,32 +185,37 @@
     return true;
   }
 
-  // ========== FUNCTION TO CHECK IGNORED NAVIGATIONS ==========
-  function shouldIgnoreNavigation(fromPath, toPath) {
+// ========== FUNCTION TO CHECK IGNORED NAVIGATIONS ==========
+function shouldIgnoreNavigation(fromPath, toPath) {
     const offersGamePath = '/offers/game';
     const earnPath = '/earn';
-    const offerPathPattern = /^\/offer\//;
+    const offerPathPattern = /^\/offer\//;  // Matches /offer/anything/anything
 
-    // Log what we're checking for debugging
-    console.log(`🦆 Checking navigation: ${fromPath || 'initial'} → ${toPath}`);
+    // Detailed logging to see exactly what's happening
+    console.log('🦆 ===== NAVIGATION DEBUG ====');
+    console.log('🦆 From:', fromPath || 'initial');
+    console.log('🦆 To:', toPath);
+    console.log('🦆 From is offer?', offerPathPattern.test(fromPath));
+    console.log('🦆 To is offer?', offerPathPattern.test(toPath));
 
     // Case 1: /offers/game <--> /offer/
     if ((fromPath === offersGamePath && offerPathPattern.test(toPath)) ||
         (offerPathPattern.test(fromPath) && toPath === offersGamePath)) {
-        console.log('🦆 ✓ Ignoring: Between /offers/game and /offer/');
+        console.log('🦆 ✓ IGNORING: Between /offers/game and /offer/');
         return true;
     }
 
-    // Case 2: /earn <--> /offer/
+    // Case 2: /earn <--> /offer/ (THIS IS YOUR CASE)
     if ((fromPath === earnPath && offerPathPattern.test(toPath)) ||
         (offerPathPattern.test(fromPath) && toPath === earnPath)) {
-        console.log('🦆 ✓ Ignoring: Between /earn and /offer/');
+        console.log('🦆 ✓ IGNORING: Between /earn and /offer/');
         return true;
     }
 
-    console.log('🦆 ✗ Not ignoring this navigation');
+    console.log('🦆 ✗ NOT ignoring this navigation');
+    console.log('🦆 =========================');
     return false;
-  }
+}
 
   function showDuck() {
     if (!isDuckLoadingEnabled()) {
