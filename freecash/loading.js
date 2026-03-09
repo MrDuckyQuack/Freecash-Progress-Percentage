@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Freecash Duck Loading
 // @namespace    freecash-duck-Loading
-// @version      1.9.2
+// @version      2.0.1
 // @description  Shows a cute duck loading screen on Freecash with animated floating ducks and balloons
 // @author       DuckyQuack
 // @match        https://freecash.com/*
@@ -165,7 +165,8 @@
   let hasShownInitial = false;
   let modalObserver = null;
   let lastUrl = window.location.href;
-  let lastPath = window.location.pathname; // Track last path for navigation comparisons
+  let lastPath = window.location.pathname;
+  let navigationInProgress = false; // Flag to prevent multiple triggers
 
   // Function to check if duck Loading is enabled
   function isDuckLoadingEnabled() {
@@ -187,12 +188,11 @@
   // ========== FUNCTION TO CHECK IGNORED NAVIGATIONS ==========
   function shouldIgnoreNavigation() {
     const currentPath = window.location.pathname;
-    const previousPath = lastPath; // Use the tracked last path
+    const previousPath = lastPath;
 
-    // Define the paths
     const offersGamePath = '/offers/game';
     const earnPath = '/earn';
-    const offerPathPattern = /^\/offer\//; // Matches any /offer/... path
+    const offerPathPattern = /^\/offer\//;
 
     // Case 1: /offers/game <--> /offer/
     if ((previousPath === offersGamePath && offerPathPattern.test(currentPath)) ||
@@ -278,20 +278,24 @@
 
     activeTimer = setTimeout(() => {
       el.classList.add('duck-hiding');
-      setTimeout(() => { el.remove(); isShowing = false; }, 500);
+      setTimeout(() => { 
+        el.remove(); 
+        isShowing = false;
+        navigationInProgress = false; // Reset flag
+      }, 500);
     }, 2000);
   }
 
   function triggerAfterDelay() {
-    if (isShowing) return;
+    if (isShowing || navigationInProgress) return;
     if (!isDuckLoadingEnabled()) {
       console.log('🦆 Duck Loading screen is disabled, not showing');
       return;
     }
-    // Check if this navigation should be ignored
     if (shouldIgnoreNavigation()) {
         return;
     }
+    navigationInProgress = true;
     setTimeout(showDuck, 10);
   }
 
@@ -304,35 +308,46 @@
     ];
 
     modalObserver = new MutationObserver((mutations) => {
+      // Only check for significant DOM changes, not every little mutation
       let shouldShow = false;
+      
+      // Check if URL changed (handled by history API)
+      if (window.location.href !== lastUrl) {
+        lastUrl = window.location.href;
+        if (!shouldIgnoreNavigation()) {
+          triggerAfterDelay();
+        }
+        return;
+      }
+      
+      // Check for modal additions (but be more selective)
       mutations.forEach(mutation => {
+        // Only care about added nodes with significant size
         if (mutation.addedNodes.length > 0) {
           mutation.addedNodes.forEach(node => {
             if (node.nodeType === 1) {
-              if (node.matches && (node.matches(modalSelectors.join(',')) ||
-                  node.querySelector && node.querySelector(modalSelectors.join(',')))) {
-                shouldShow = true;
+              // Check if it's a modal (has high z-index, fixed positioning)
+              const style = window.getComputedStyle(node);
+              if (style.position === 'fixed' || style.position === 'absolute') {
+                const zIndex = parseInt(style.zIndex);
+                if (zIndex > 1000) {
+                  shouldShow = true;
+                }
               }
             }
           });
         }
-        if (mutation.type === 'attributes' && mutation.target.matches) {
-          if (mutation.target.matches(modalSelectors.join(','))) {
-            const style = window.getComputedStyle(mutation.target);
-            if (style.display !== 'none' && style.visibility !== 'hidden' && style.opacity !== '0') {
-              shouldShow = true;
-            }
-          }
-        }
       });
-      if (shouldShow && !isShowing && hasShownInitial && isDuckLoadingEnabled()) {
+
+      if (shouldShow && !isShowing && !navigationInProgress && hasShownInitial && isDuckLoadingEnabled()) {
         triggerAfterDelay();
       }
     });
 
     modalObserver.observe(document.body, {
-      childList: true, subtree: true, attributes: true,
-      attributeFilter: ['style', 'class', 'display', 'visibility']
+      childList: true,
+      subtree: true,
+      attributes: false // Don't watch attributes, too noisy
     });
     console.log('🔍 Modal detection active');
   }
@@ -346,7 +361,7 @@
         const currentOfferId = offerMatch[1];
         if (currentOfferId !== lastOfferId) {
           lastOfferId = currentOfferId;
-          if (hasShownInitial && isDuckLoadingEnabled() && !isShowing && !shouldIgnoreNavigation()) {
+          if (hasShownInitial && isDuckLoadingEnabled() && !isShowing && !navigationInProgress && !shouldIgnoreNavigation()) {
             console.log('🦆 Offer page detected:', currentOfferId);
             triggerAfterDelay();
           }
@@ -354,21 +369,6 @@
       } else { lastOfferId = null; }
     }
     checkForOfferPage();
-    const offerObserver = new MutationObserver(() => {
-      if (window.location.pathname.includes('/offer/') && !isShowing && !shouldIgnoreNavigation()) {
-        const mainContent = document.querySelector('main, [class*="content"], [class*="offer"]');
-        if (mainContent && mainContent.children.length > 0) {
-          const currentOfferId = window.location.pathname.match(/\/offer\/([^\/]+)/)?.[1];
-          if (currentOfferId && currentOfferId !== lastOfferId) {
-            lastOfferId = currentOfferId;
-            triggerAfterDelay();
-          }
-        }
-      }
-    });
-    if (document.body) {
-      offerObserver.observe(document.body, { childList: true, subtree: true, attributes: false });
-    }
   }
 
   // Listen for config changes
@@ -389,14 +389,19 @@
   } else if (!hasShownInitial) {
     if (document.readyState === 'complete') {
       hasShownInitial = true;
-      triggerAfterDelay();
+      // Don't show on initial load if it's one of the ignored pages
+      if (!shouldIgnoreNavigation()) {
+        triggerAfterDelay();
+      }
       setupModalDetection();
       setupOfferPageDetection();
     } else {
       window.addEventListener('load', () => {
         if (!hasShownInitial) {
           hasShownInitial = true;
-          triggerAfterDelay();
+          if (!shouldIgnoreNavigation()) {
+            triggerAfterDelay();
+          }
           setupModalDetection();
           setupOfferPageDetection();
         }
@@ -411,36 +416,28 @@
   history.pushState = function (...args) {
     _pushState(...args);
     // Update lastPath before checking navigation
-    lastPath = window.location.pathname;
+    const newPath = window.location.pathname;
     if (hasShownInitial && isDuckLoadingEnabled() && !shouldIgnoreNavigation()) {
       triggerAfterDelay();
-      setTimeout(() => {
-        if (window.location.pathname.includes('/offer/')) { setupOfferPageDetection(); }
-      }, 100);
     }
+    lastPath = newPath;
   };
 
   history.replaceState = function (...args) {
     _replaceState(...args);
-    lastPath = window.location.pathname;
-    if (hasShownInitial && isDuckLoadingEnabled() && !shouldIgnoreNavigation()) {
-      triggerAfterDelay();
-      setTimeout(() => {
-        if (window.location.pathname.includes('/offer/')) { setupOfferPageDetection(); }
-      }, 100);
-    }
-  };
-
-  window.addEventListener('popstate', () => {
-    // Update lastPath for popstate as well
     const newPath = window.location.pathname;
     if (hasShownInitial && isDuckLoadingEnabled() && !shouldIgnoreNavigation()) {
       triggerAfterDelay();
-      setTimeout(() => {
-        if (newPath.includes('/offer/')) { setupOfferPageDetection(); }
-      }, 100);
     }
-    lastPath = newPath; // Update after potential trigger
+    lastPath = newPath;
+  };
+
+  window.addEventListener('popstate', () => {
+    const newPath = window.location.pathname;
+    if (hasShownInitial && isDuckLoadingEnabled() && !shouldIgnoreNavigation()) {
+      triggerAfterDelay();
+    }
+    lastPath = newPath;
   });
 
   // Periodic config check
@@ -450,7 +447,9 @@
     if (isDuckLoadingEnabled()) {
       if (!hasShownInitial && !isShowing) {
         hasShownInitial = true;
-        showDuck();
+        if (!shouldIgnoreNavigation()) {
+          showDuck();
+        }
         setupModalDetection();
         setupOfferPageDetection();
       }
@@ -458,16 +457,4 @@
     } else if (checkCount > 20) { clearInterval(configCheck); }
   }, 100);
 
-  // Click monitoring
-  document.addEventListener('click', (e) => {
-    const target = e.target.closest('a[href*="/user/"], button[class*="profile"], [class*="avatar"], [class*="Avatar"]');
-    if (target && hasShownInitial && isDuckLoadingEnabled() && !isShowing && !shouldIgnoreNavigation()) {
-      setTimeout(() => { triggerAfterDelay(); }, 100);
-    }
-    const offerTarget = e.target.closest('a[href*="/offer/"], [class*="offer"], [class*="Offer"]');
-    if (offerTarget && hasShownInitial && isDuckLoadingEnabled() && !isShowing && !shouldIgnoreNavigation()) {
-      setTimeout(() => { triggerAfterDelay(); }, 100);
-    }
-  }, true);
-
-})();a
+})();
