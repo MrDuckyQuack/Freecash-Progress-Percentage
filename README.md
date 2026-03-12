@@ -47,7 +47,7 @@ Add this loader script to your Tampermonkey. It will automatically fetch the lat
 // ==UserScript==
 // @name         Freecash Loader - DuckyQuack
 // @namespace    freecash-loader-ducky
-// @version      2.2
+// @version      2.2.1
 // @description  Dynamic loader for Freecash scripts
 // @author       DuckyQuack
 // @match        https://freecash.com/*
@@ -61,7 +61,7 @@ Add this loader script to your Tampermonkey. It will automatically fetch the lat
 (function () {
     "use strict";
 
-    const BASE_URL = "https://raw.githubusercontent.com/MrDuckyQuack/Freecash-Progress-Percentage/main/freecash/";
+    const BASE_URL = "https://raw.githubusercontent.com/MrDuckyQuack/Freecash/main/freecash/";
     const MANIFEST_URL = BASE_URL + "loader-manifest.json?v=" + Date.now();
 
     async function fetchFile(url) {
