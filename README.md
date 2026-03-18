@@ -139,7 +139,7 @@ This version will automatically update whenever I push improvements! 🚀
 
 ### Option 2: Manual (No Auto-Updates)
 If you prefer to read the code or don't want auto-updates, use the main script directly:
-https://github.com/MrDuckyQuack/Freecash-Progress-Percentage/tree/main/freecash
+https://github.com/MrDuckyQuack/Freecash/tree/main/freecash
 
 -------------------------------------------------------------------------------
 
